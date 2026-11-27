@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>عزم - تدخّل للحفاظ على تركيزك</title>
+  <link rel="stylesheet" href="intercept.css">
+</head>
+<body>
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/><path d="M12 8v4"/><path d="M12 15h.01"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15c-1.5 1.2-2 4-2 6 2 0 4.8-.5 6-2"/><path d="M12 15l-3-3a22 22 0 0 1 2-4 12 12 0 0 1 11-5c0 4-1.5 8-5 11a22 22 0 0 1-5 1z"/><circle cx="16" cy="8" r="1.3"/><path d="M9 12H4s.5-3 2-4c1.3-.8 4 0 4 0"/><path d="M12 15v5s3-.5 4-2c.8-1.3 0-4 0-4"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2"/><path d="M7 3v2M10 3v2M13 3v2"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></symbol>
+  </svg>
+
+  <main class="stage">
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true">ع</div>
+      <div class="brand-text">
+        <strong>AZM AI</strong>
+        <span>رفيقك الذكي للدراسة والتركيز</span>
+      </div>
+    </header>
+
+    <!-- ========== جلسة جارية: شاشة التدخّل ========== -->
+    <section id="panelActive" class="panel card" hidden>
+      <div class="alert">
+        <span class="alert-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg></span>
+        <div>
+          <h1>أنت الآن خارج نطاق جلستك</h1>
+          <p>حاولت فتح موقع غير مدرج ضمن الموارد المعتمدة للجلسة الجارية.</p>
+        </div>
+      </div>
+
+      <div class="blocked-box">
+        <span class="label"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>الموقع المحجوب</span>
+        <strong id="blockedHost" class="blocked-host" dir="ltr"></strong>
+        <code id="blockedUrl" class="blocked-url" dir="ltr"></code>
+      </div>
+
+      <div id="verdictBox" class="verdict">
+        <span id="verdictTag" class="verdict-tag"></span>
+        <span id="verdictReason" class="verdict-reason"></span>
+      </div>
+
+      <p id="personaMsg" class="persona-msg"></p>
+
+      <div class="session-card">
+        <div class="session-head">
+          <span id="personaBadge" class="persona-badge"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span id="personaName"></span></span>
+          <div class="timer-block">
+            <span class="label"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>الوقت المتبقي</span>
+            <div id="timer" class="timer" dir="ltr" role="timer">00:00</div>
+            <span id="sTime" class="time-info"></span>
+          </div>
+        </div>
+        <dl class="session-info">
+          <div><dt><svg class="icon" aria-hidden="true"><use href="#i-target"/></svg>الهدف</dt><dd id="sGoal"></dd></div>
+          <div><dt><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>المهمة الحالية</dt><dd id="sTask"></dd></div>
+          <div><dt><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg>النتيجة المتوقعة</dt><dd id="sOutcome"></dd></div>
+        </dl>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="btnBack" class="btn btn-primary btn-lg"><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg><span>العودة إلى الجلسة والتركيز</span></button>
+        <button type="button" id="btnJustify" class="btn btn-outline btn-lg"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg><span>تبرير الحاجة وإضافة الرابط مؤقتًا للجلسة</span></button>
+      </div>
+
+      <!-- بطاقة التبرير: تظهر فقط عند الضغط على زر التبرير -->
+      <div id="justifyCard" class="justify-card" hidden>
+        <label for="reason">لماذا تحتاج هذا الرابط الآن؟ وكيف يخدم هدفك؟</label>
+        <textarea id="reason" class="input" rows="3" maxlength="300" placeholder="مثال: أحتاج هذا الفيديو لفهم الدرس الحالي من المقرر."></textarea>
+        <div class="justify-meta">
+          <span id="reasonHint" class="hint"></span>
+          <span id="cooldownHint" class="hint"></span>
+        </div>
+        <p id="justifyError" class="field-error" role="alert" hidden></p>
+
+        <!-- نتيجة تقييم التبرير -->
+        <div id="feedback" class="feedback" role="alert" hidden>
+          <svg id="feedbackIcon" class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+          <p id="feedbackText"></p>
+        </div>
+
+        <div id="justifyActions" class="justify-actions">
+          <button type="button" id="btnConfirm" class="btn btn-success" disabled><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span id="confirmLabel">إرسال التبرير</span></button>
+          <button type="button" id="btnCancel" class="btn btn-ghost"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg><span>إلغاء</span></button>
+        </div>
+
+        <!-- عرض الاستراحة (يظهر فقط عند قبول طلب استراحة) -->
+        <div id="breakOffer" class="justify-actions" hidden>
+          <button type="button" id="btnStartBreak" class="btn btn-success"><svg class="icon" aria-hidden="true"><use href="#i-coffee"/></svg><span>ابدأ الاستراحة وافتح الموقع</span></button>
+          <button type="button" id="btnBreakBack" class="btn btn-ghost"><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg><span>العودة إلى الجلسة</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== لا توجد جلسة جارية ========== -->
+    <section id="panelEnded" class="panel card panel-ended" hidden>
+      <div class="alert alert-ok">
+        <span class="alert-icon"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg></span>
+        <div>
+          <h1>لا توجد جلسة جارية</h1>
+          <p id="endedText">انتهت جلسة الدراسة، ولم تعد هناك قيود على التصفح.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" id="btnContinue" class="btn btn-primary btn-lg" hidden><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg><span>متابعة إلى الموقع</span></button>
+        <button type="button" id="btnDashboard" class="btn btn-outline btn-lg"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>فتح لوحة عزم</span></button>
+      </div>
+    </section>
+  </main>
+
+  <script src="azm-api.js"></script>
+  <script src="evaluator.js"></script>
+  <script src="intercept.js"></script>
+</body>
+</html>

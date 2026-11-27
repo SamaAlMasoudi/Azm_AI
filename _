@@ -1,0 +1,9 @@
+# Azm AI — local configuration
+DATABASE_URL="file:./db/custom.db"
+NODE_ENV="development"
+# Optional server-side AI provider. Never put this in Extentions/.
+AI_PROVIDER="off"
+GROQ_API_KEY=""
+GROQ_MODEL="llama-3.1-8b-instant"
+# Optional, only if the selected provider needs it.
+AI_TIMEOUT_MS="18000"

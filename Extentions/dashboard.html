@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>عزم - AZM AI</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <!-- مكتبة الأيقونات (SVG sprite) — أيقونات خطية موحّدة -->
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h10"/><path d="M18 6h2"/><circle cx="16" cy="6" r="2"/><path d="M4 12h2"/><path d="M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 18h10"/><path d="M18 18h2"/><circle cx="16" cy="18" r="2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15c-1.5 1.2-2 4-2 6 2 0 4.8-.5 6-2"/><path d="M12 15l-3-3a22 22 0 0 1 2-4 12 12 0 0 1 11-5c0 4-1.5 8-5 11a22 22 0 0 1-5 1z"/><circle cx="16" cy="8" r="1.3"/><path d="M9 12H4s.5-3 2-4c1.3-.8 4 0 4 0"/><path d="M12 15v5s3-.5 4-2c.8-1.3 0-4 0-4"/></symbol>
+    <symbol id="i-folder-save" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10.5v5"/><path d="M9.5 13.5L12 16l2.5-2.5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8.5" width="16" height="11" rx="3.5"/><path d="M12 8.5V5"/><circle cx="12" cy="3.8" r="1.1"/><circle cx="9" cy="13.5" r="1.2"/><circle cx="15" cy="13.5" r="1.2"/><path d="M9.5 16.8h5"/><path d="M2 13v2M22 13v2"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"/><path d="M12 6.5v13"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+    <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+    <symbol id="i-help-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/><path d="M12 8v4"/><path d="M12 15h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2"/><path d="M7 3v2M10 3v2M13 3v2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+  </svg>
+
+  <div class="app">
+
+    <!-- ========== شريط التنقل العلوي ========== -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><img src="icons/logo.png" alt="AZM" style="width:32px;height:32px;border-radius:8px;"></div>
+        <div class="brand-text">
+          <strong>AZM AI</strong>
+          <span>رفيقك الذكي للدراسة والتركيز</span>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="التنقل الرئيسي">
+        <button type="button" class="tab" data-view="home"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>الرئيسية</span></button>
+        <button type="button" class="tab" data-view="stats"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>الإحصاءات</span></button>
+        <button type="button" class="tab" data-view="settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span>الإعدادات</span></button>
+      </nav>
+
+      <div class="top-actions">
+        <button type="button" id="btnOpenTab" class="btn btn-ghost btn-sm" hidden><svg class="icon" aria-hidden="true"><use href="#i-external"/></svg><span>فتح في تبويب</span></button>
+        <button type="button" id="btnNewSession" class="btn btn-primary" data-view="new"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>جلسة دراسة جديدة</span></button>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- ========== الرئيسية ========== -->
+      <section id="view-home" class="view" data-panel="home">
+
+        <div id="hero" class="hero card">
+          <!-- حالة الخمول -->
+          <div id="heroIdle" class="hero-idle">
+            <span class="eyebrow">جاهز للانطلاق</span>
+            <h1>أهلاً بك في عزم</h1>
+            <p>عزم يحمي تركيزك، ويتدخل فقط حين تنحرف عن هدفك.</p>
+            <button type="button" class="btn btn-primary btn-lg" data-view="new"><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg><span>بدء جلسة جديدة</span></button>
+          </div>
+
+          <!-- حالة الجلسة الجارية -->
+          <div id="heroActive" class="hero-active" hidden>
+            <div class="active-head">
+              <span class="live-badge"><span class="live-dot" aria-hidden="true"></span>جلسة جارية</span>
+              <span id="activeMeta" class="pill"></span>
+            </div>
+
+            <div class="timer-wrap">
+              <div id="timer" class="timer" dir="ltr" role="timer">00:00</div>
+              <div class="progress" aria-hidden="true"><div id="timerBar" class="progress-bar"></div></div>
+              <p id="elapsedInfo" class="elapsed-info"></p>
+            </div>
+
+            <div id="breakBanner" class="break-banner" role="status" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-coffee"/></svg>
+              <div>
+                <strong>استراحة قصيرة جارية</strong>
+                <span id="breakText"></span>
+              </div>
+            </div>
+
+            <dl class="session-info">
+              <div><dt><svg class="icon" aria-hidden="true"><use href="#i-target"/></svg>الهدف</dt><dd id="activeGoal"></dd></div>
+              <div><dt><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>المهمة الحالية</dt><dd id="activeTask"></dd></div>
+              <div><dt><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg>النتيجة المتوقعة</dt><dd id="activeOutcome"></dd></div>
+            </dl>
+
+            <div class="live-links">
+              <h3><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>الروابط المسموحة</h3>
+              <ul id="liveLinks" class="chip-list"></ul>
+
+              <form id="liveUrlForm" class="inline-form" novalidate>
+                <label class="sr-only" for="liveUrlInput">رابط إضافي</label>
+                <input id="liveUrlInput" class="input" type="text" inputmode="url" dir="ltr" placeholder="أضف رابطًا إضافيًا، مثل https://example.com" autocomplete="off">
+                <button type="submit" class="btn btn-outline"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>إضافة</span></button>
+              </form>
+              <p id="liveUrlError" class="field-error" role="alert" hidden></p>
+              <div id="liveQuick" class="chip-row" aria-label="اقتراحات سريعة"></div>
+            </div>
+
+            <div class="active-actions">
+              <button type="button" id="btnEnd" class="btn btn-danger"><svg class="icon icon-fill" aria-hidden="true"><use href="#i-stop"/></svg><span>إنهاء الجلسة</span></button>
+            </div>
+          </div>
+        </div>
+
+        <section class="block">
+          <h2 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>هذا الأسبوع</h2>
+          <div id="statsHome" class="stats-row"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-sparkle"/></svg>أدوات يوصي بها عزم</h2>
+          <div id="toolsHome" class="tools-grid"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>مجموعات الجلسات</h2>
+          <div id="groupsList" class="groups-list"></div>
+        </section>
+      </section>
+
+      <!-- ========== جلسة دراسة جديدة ========== -->
+      <section id="view-new" class="view" data-panel="new" hidden>
+        <div class="view-head">
+          <h1>جلسة دراسة جديدة</h1>
+          <p>حدّد هدفك بوضوح، ودع عزم يحمي تركيزك.</p>
+        </div>
+
+        <p id="activeWarning" class="notice notice-warning" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>لديك جلسة جارية حاليًا. بدء جلسة جديدة سيُنهي الجلسة الحالية ويسجّلها في سجل الجلسات.</span>
+        </p>
+
+        <form id="sessionForm" class="session-form" novalidate>
+
+          <!-- 1 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">1</span>هدف الدراسة</legend>
+            <input id="goal" class="input" type="text" maxlength="120" placeholder="ما الذي تريد إنجازه في دراستك؟" autocomplete="off">
+            <p id="err-goal" class="field-error" role="alert" hidden></p>
+            <div class="chip-row" aria-label="أمثلة سريعة">
+              <button type="button" class="chip" data-fill="مسار Coursera">مسار Coursera</button>
+              <button type="button" class="chip" data-fill="مشروع تخرج">مشروع تخرج</button>
+              <button type="button" class="chip" data-fill="اختبار نهائي">اختبار نهائي</button>
+            </div>
+          </fieldset>
+
+          <!-- 2 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">2</span>المهمة الحالية</legend>
+            <input id="task" class="input" type="text" maxlength="160" placeholder="ما المهمة المحددة التي ستعمل عليها الآن؟" autocomplete="off">
+            <p id="err-task" class="field-error" role="alert" hidden></p>
+          </fieldset>
+
+          <!-- 3 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">3</span>النتيجة المتوقعة</legend>
+            <textarea id="outcome" class="input textarea" rows="3" maxlength="240" placeholder="كيف ستعرف أنك أنجزت المهمة؟ مثال: حل 15 مسألة وتلخيص الفصل."></textarea>
+            <p id="err-outcome" class="field-error" role="alert" hidden></p>
+          </fieldset>
+
+          <!-- 4 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">4</span>تقنية التركيز</legend>
+            <div class="option-grid">
+              <label class="option">
+                <input type="radio" name="technique" value="pomodoro" checked>
+                <span class="option-body"><strong>بومودورو 25/5</strong><small>25 دقيقة تركيز ثم 5 دقائق راحة</small></span>
+              </label>
+              <label class="option">
+                <input type="radio" name="technique" value="52-17">
+                <span class="option-body"><strong>قاعدة 52/17</strong><small>52 دقيقة تركيز ثم 17 دقيقة راحة</small></span>
+              </label>
+              <label class="option">
+                <input type="radio" name="technique" value="custom">
+                <span class="option-body"><strong>مخصص</strong><small>حدّد مدة التركيز بنفسك</small></span>
+              </label>
+            </div>
+            <div class="duration-box">
+              <label for="durationMinutes">مدة الجلسة بالدقائق <small>(أي مدة من 1 إلى 360 دقيقة)</small></label>
+              <div class="duration-controls">
+                <input id="durationMinutes" class="input input-short" type="number" min="1" max="360" step="1" value="25" dir="ltr" inputmode="numeric">
+                <span class="unit">دقيقة</span>
+              </div>
+              <div class="chip-row" aria-label="مدد شائعة">
+                <button type="button" class="chip" data-minutes="15">15</button>
+                <button type="button" class="chip" data-minutes="30">30</button>
+                <button type="button" class="chip" data-minutes="45">45</button>
+                <button type="button" class="chip" data-minutes="60">60</button>
+                <button type="button" class="chip" data-minutes="90">90</button>
+                <button type="button" class="chip" data-minutes="120">120</button>
+              </div>
+            </div>
+            <p id="err-custom" class="field-error" role="alert" hidden></p>
+          </fieldset>
+
+          <!-- 5 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">5</span>شخصية عزم</legend>
+            <div class="option-grid">
+              <label class="option">
+                <input type="radio" name="persona" value="strict">
+                <span class="option-body"><strong>المدرب الصارم</strong><small>حازم ولا يقبل الأعذار الضعيفة</small></span>
+              </label>
+              <label class="option">
+                <input type="radio" name="persona" value="supportive" checked>
+                <span class="option-body"><strong>الصديق الداعم</strong><small>يشجعك بلطف ويعيدك إلى المسار</small></span>
+              </label>
+              <label class="option">
+                <input type="radio" name="persona" value="philosopher">
+                <span class="option-body"><strong>الفيلسوف المنطقي</strong><small>يسألك: هل هذا يخدم هدفك فعلًا؟</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- 6 -->
+          <fieldset class="step card">
+            <legend class="step-legend"><span class="step-num">6</span>الموارد المعتمدة</legend>
+            <div class="inline-form">
+              <label class="sr-only" for="urlInput">رابط المورد</label>
+              <input id="urlInput" class="input" type="text" inputmode="url" dir="ltr" placeholder="https://example.com" autocomplete="off">
+              <button type="button" id="btnAddUrl" class="btn btn-outline"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>إضافة</span></button>
+            </div>
+            <p id="err-url" class="field-error" role="alert" hidden></p>
+            <div id="quickLinks" class="chip-row" aria-label="روابط سريعة"></div>
+
+            <ul id="draftUrls" class="chip-list"></ul>
+
+            <h3 class="sub-title"><svg class="icon" aria-hidden="true"><use href="#i-sparkle"/></svg>أدوات يوصي بها عزم</h3>
+            <div id="toolsNew" class="tools-grid"></div>
+          </fieldset>
+
+          <!-- بطاقة اسم المجموعة: مخفية حتى الضغط على «حفظ كمجموعة» -->
+          <div id="groupCard" class="group-card card" hidden>
+            <label for="groupName">اسم المجموعة</label>
+            <div class="inline-form">
+              <input id="groupName" class="input" type="text" maxlength="40" placeholder="مثال: مراجعة الرياضيات" autocomplete="off">
+              <button type="button" id="btnGroupConfirm" class="btn btn-success"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>تأكيد الحفظ</span></button>
+              <button type="button" id="btnGroupCancel" class="btn btn-ghost"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg><span>إلغاء</span></button>
+            </div>
+            <p id="err-group" class="field-error" role="alert" hidden></p>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg"><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg><span>انطلق – ابدأ الجلسة</span></button>
+            <button type="button" id="btnSaveGroup" class="btn btn-outline btn-lg"><svg class="icon" aria-hidden="true"><use href="#i-folder-save"/></svg><span>حفظ كمجموعة</span></button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ========== الإحصاءات ========== -->
+      <section id="view-stats" class="view" data-panel="stats" hidden>
+        <div class="view-head">
+          <h1>الإحصاءات</h1>
+          <p>نظرة سريعة على تركيزك وتقدّمك.</p>
+        </div>
+
+        <section class="block">
+          <h2 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>هذا الأسبوع</h2>
+          <div id="statsView" class="stats-row"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>سجل الجلسات</h2>
+          <div id="historyList" class="history-list"></div>
+        </section>
+      </section>
+
+      <!-- ========== الإعدادات ========== -->
+      <section id="view-settings" class="view" data-panel="settings" hidden>
+        <div class="view-head">
+          <h1>الإعدادات</h1>
+          <p>تحكّم في طريقة عمل عزم. تُحفظ التغييرات تلقائيًا.</p>
+        </div>
+
+        <div class="card settings-card">
+          <div class="setting-row" style="display:block">
+            <span class="setting-text"><strong>ربط Backend عزم</strong><small>أدخل رابط الخادم ورمز الاقتران من تطبيق عزم. لا تضع أي API Key في الإضافة.</small></span>
+            <div class="inline-form" style="margin-top:12px"><input id="apiBaseUrl" class="input" dir="ltr" placeholder="http://localhost:3000"><input id="apiToken" class="input" dir="ltr" type="password" placeholder="رمز الاقتران"><button type="button" id="btnSaveApi" class="btn btn-outline">حفظ واختبار</button></div>
+            <p id="apiStatus" class="field-error" hidden></p>
+          </div>
+          <label class="setting-row">
+            <span class="setting-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span>
+            <span class="setting-text">
+              <strong>بيئة تصفح محاكاة</strong>
+              <small>تجربة بيئة تصفح تجريبية لاختبار تدخلات عزم دون التأثير على تصفحك المعتاد.</small>
+            </span>
+            <input type="checkbox" class="switch-input" role="switch" data-setting="simulatedBrowsing">
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+
+          <label class="setting-row">
+            <span class="setting-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></span>
+            <span class="setting-text">
+              <strong>عزل المساحات</strong>
+              <small>فصل مساحة الدراسة عن بقية تصفحك حتى لا تتداخل الأنشطة.</small>
+            </span>
+            <input type="checkbox" class="switch-input" role="switch" data-setting="spaceIsolation">
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+
+          <label class="setting-row">
+            <span class="setting-icon"><svg class="icon" aria-hidden="true"><use href="#i-bot"/></svg></span>
+            <span class="setting-text">
+              <strong>الوكيل الذكي</strong>
+              <small>يقيّم مبرراتك عند الانحراف عن هدفك ويقرر مستوى التدخل المناسب.</small>
+            </span>
+            <input type="checkbox" class="switch-input" role="switch" data-setting="smartAgent">
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="card danger-zone">
+          <div>
+            <h2><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>منطقة الخطر</h2>
+            <p>سيتم حذف الجلسة الجارية والمجموعات والسجل والإحصاءات والإعدادات نهائيًا.</p>
+          </div>
+          <button type="button" id="btnClear" class="btn btn-danger-outline"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg><span>مسح كل البيانات</span></button>
+          <div id="clearConfirm" class="clear-confirm" hidden>
+            <p>هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="inline-actions">
+              <button type="button" id="btnClearYes" class="btn btn-danger"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg><span>نعم، امسح كل شيء</span></button>
+              <button type="button" id="btnClearNo" class="btn btn-ghost"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg><span>إلغاء</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="brand-mark brand-mark-sm" aria-hidden="true"><img src="icons/logo.png" alt="AZM" style="width:32px;height:32px;border-radius:8px;"></div>
+        <div class="brand-text">
+          <strong>AZM AI</strong>
+          <span>رفيقك الذكي للدراسة والتركيز</span>
+        </div>
+      </div>
+      <p>بيئة تصفح مُحاكاة · الإصدار 1.1 — عزل المساحات، الوكيل الذكي، مستويات التدخل، الذاكرة، الإضافة</p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="azm-api.js"></script>
+  <script src="evaluator.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

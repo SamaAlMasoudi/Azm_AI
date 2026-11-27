@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// An isolated workspace: every visitor gets their own profile (data never
+// crosses profiles). Recoverable/movable via the 8-char profile code.
+model Profile {
+  id                String   @id @default(cuid())
+  code              String   @unique // 8 chars, recovery + device transfer
+  name              String   @default("")
+  lang              String   @default("ar")
+  interventionLevel String   @default("balanced") // passive | gentle | balanced | strict
+  aiProvider        String   @default("builtin") // builtin | openai | anthropic | groq | ollama | off
+  aiModel           String   @default("")
+  aiBaseUrl         String   @default("")
+  aiApiKey          String   @default("") // key of the ACTIVE provider (mirrors aiKeysJson)
+  aiKeysJson        String   @default("{}") // vault: {"groq":"gsk_…","openai":"sk-…"} — never returned raw to the UI
+  challengeSeconds  Int      @default(30) // configurable human-intervention window (10–120s)
+  pairingToken      String   @unique // secure pairing between the app and the Chrome extension
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  groups        SessionGroup[]
+  sessions      StudySession[]
+  interventions Intervention[]
+  passes        EmergencyPass[]
+  memories      MemoryItem[]
+  grants        Grant[]
+  challenges    Challenge[]
+}
+
+// A reusable study session template ("مجموعة جلسات")
+model SessionGroup {
+  id              String   @id @default(cuid())
+  profileId       String
+  name            String
+  goal            String
+  task            String
+  expectedOutcome String
+  technique       String // pomodoro | 5217 | custom
+  workMinutes     Int
+  breakMinutes    Int
+  personality     String // strict | friend | philosopher
+  allowedSites    String // JSON array of ScopeEntry
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// A study session (active or ended)
+model StudySession {
+  id                     String    @id @default(cuid())
+  profileId              String
+  groupId                String?
+  goal                   String
+  task                   String
+  expectedOutcome        String
+  technique              String
+  workMinutes            Int
+  breakMinutes           Int
+  personality            String
+  level                  String    @default("balanced") // intervention level snapshot
+  allowedSites           String // JSON array of ScopeEntry
+  status                 String    @default("active") // active | ended
+  startedAt              DateTime  @default(now())
+  endedAt                DateTime?
+  focusedSeconds         Int       @default(0)
+  breakSeconds           Int       @default(0)
+  breakUsedSeconds       Int       @default(0) // agent-granted smart breaks (budget)
+  breakUntil             DateTime? // while a smart break is running (extension must not challenge)
+  distractionAttempts    Int       @default(0)
+  interventionsBlocked   Int       @default(0)
+  interventionsApproved  Int       @default(0)
+  interventionsUncertain Int       @default(0)
+  uncertainStreak        Int       @default(0) // consecutive uncertain navigations (Balanced policy)
+  rounds                 Int       @default(1)
+  emergencyPassUsed      Boolean   @default(false)
+  treeStage              Int       @default(0)
+  verificationVerdict    String? // achieved | partial | not_achieved
+  verificationMessage    String?
+  accomplishments        String?
+  reportJson             String? // full session report (interventions, grants, memory, counters)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+}
+
+// A recorded interception event
+model Intervention {
+  id             String   @id @default(cuid())
+  profileId      String
+  sessionId      String
+  siteName       String
+  siteUrl        String
+  category       String
+  explanation    String   @default("")
+  verdict        String // approved | rejected | timeout | self_corrected | granted_break
+  classification String // supportive | uncertain | distracting | none
+  aiMessage      String   @default("")
+  confidence     Float?
+  source         String   @default("link") // link | address_bar | search | extension
+  aiSource       String   @default("ai") // ai | heuristic
+  createdAt      DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, sessionId])
+}
+
+// Emergency session-exit pass, max one per ISO week (per profile)
+model EmergencyPass {
+  id        String   @id @default(cuid())
+  profileId String
+  weekKey   String
+  usedAt    DateTime @default(now())
+  sessionId String?
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, weekKey])
+}
+
+// AI Memory — what Azm remembers about the student (goals, tasks, deadlines…)
+model MemoryItem {
+  id        String   @id @default(cuid())
+  profileId String
+  text      String
+  source    String   @default("user") // user | agent
+  createdAt DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// Temporary Access — a time-boxed permission granted by the agent after a
+// convincing justification. Never added to the permanent allow-list.
+model Grant {
+  id        String   @id @default(cuid())
+  profileId String
+  sessionId String?
+  domain    String
+  minutes   Int
+  reason    String   @default("")
+  source    String   @default("web") // web | extension
+  grantedAt DateTime @default(now())
+  expiresAt DateTime
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, expiresAt])
+}
+
+// A live agent challenge (site justification conversation) — survives reloads
+model Challenge {
+  id             String    @id @default(cuid())
+  profileId      String
+  sessionId      String?
+  kind           String    @default("site") // site | break
+  domain         String    @default("")
+  title          String    @default("")
+  url            String    @default("")
+  category       String    @default("unknown")
+  classification String    @default("uncertain") // relevant | unrelated | uncertain
+  reason         String    @default("") // classifier explanation shown to the student
+  status         String    @default("asking") // asking | thinking | granted | denied | left | timeout
+  round          Int       @default(1)
+  maxRounds      Int       @default(2)
+  timerSec       Int       @default(10)
+  extensions     Int       @default(0) // how many times the student extended this window
+  deadline       DateTime?
+  linesJson      String    @default("[]") // ChatLine[] {role, text}
+  source         String    @default("web") // web | extension
+  tabId          Int? // extension tab only
+  lang           String    @default("ar")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+}

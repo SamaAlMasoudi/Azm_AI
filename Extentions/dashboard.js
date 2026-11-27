@@ -18,7 +18,18 @@
     settings: 'settings',
     preferred: 'preferredDomains'
   });
+const isPopup = new URLSearchParams(location.search).get("popup") === "1";
+const btnOpenTab = document.getElementById("btnOpenTab");
 
+if (isPopup) {
+  document.documentElement.classList.add("popup");
+  if (btnOpenTab) {
+    btnOpenTab.hidden = false;
+    btnOpenTab.addEventListener("click", () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL("https://azm-ai.onrender.com") });
+    });
+  }
+}
   const LS_PREFIX = 'azm_';
   const HISTORY_LIMIT = 100;
   const MIN_MINUTES = 1;

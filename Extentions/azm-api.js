@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const CONFIG_KEY = 'azmApiConfig';
-  const DEFAULT_BASE = 'http://localhost:3000';
+  const DEFAULT_BASE = 'https://azm-ai.onrender.com';
   async function getConfig() {
     const data = await chrome.storage.local.get(CONFIG_KEY);
     const value = data[CONFIG_KEY] && typeof data[CONFIG_KEY] === 'object' ? data[CONFIG_KEY] : {};

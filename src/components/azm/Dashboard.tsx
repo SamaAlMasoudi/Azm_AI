@@ -1,4 +1,4 @@
-/* Azm — dashboard: weekly statement, stats (brand 04), session groups, recommended tools */
+/* Azm — dashboard: synced with extension dashboard design */
 
 "use client";
 
@@ -7,19 +7,18 @@ import { useAzm } from "@/lib/azm/store";
 import { getDict } from "@/lib/azm/i18n";
 import { apiAnalytics } from "@/lib/azm/api";
 import type { AnalyticsSummary, SessionGroupDTO } from "@/lib/azm/types";
-import { LogoBadge } from "./Logo";
 import { ToolRecommends } from "./ToolRecommends";
 import {
+  Rocket,
   PlayCircle,
   Pencil,
   Trash2,
-  ShieldCheck,
-  ShieldAlert,
+  CheckCircle2,
+  XCircle,
   HelpCircle,
-  Zap,
-  Sparkles,
-  Plus,
-  Layers,
+  ShieldAlert,
+  BarChart3,
+  Folder,
 } from "lucide-react";
 
 function StatCard({
@@ -34,13 +33,27 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="azm-card azm-card-hover p-4">
-      <div className="flex items-center gap-2 text-[13px] font-medium text-azm-muted">
+    <div
+className="flex items-center gap-3.5 rounded-[18px] border border-[#A79BC8]/16 bg-[#130C22] px-4 py-4 transition-colors hover:border-[#A79BC8]/30"
+      style={{ borderTop: `3px solid ${color}` }}
+    >
+      <div
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px]"
+        style={{
+          color,
+          backgroundColor: `${color}24`,
+        }}
+      >
         {icon}
-        <span>{label}</span>
       </div>
-      <div className="azm-nums mt-2 text-3xl font-bold" style={{ color }}>
-        {value}
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="truncate text-[13.5px] text-[#A79BC8]">{label}</span>
+        <span
+          className="text-[32px] font-extrabold leading-tight tabular-nums"
+          style={{ color }}
+        >
+          {value}
+        </span>
       </div>
     </div>
   );
@@ -68,16 +81,16 @@ function GroupCard({ group }: { group: SessionGroupDTO }) {
   };
 
   return (
-    <div className="azm-card azm-card-hover p-5 flex flex-col gap-3">
+    <div className="flex flex-col gap-3 rounded-[18px] border border-[#A79BC8]/16 bg-[#130C22] p-5 transition-colors hover:border-[#A79BC8]/34">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-azm-ink">{group.name}</h3>
-          <p className="mt-0.5 line-clamp-2 text-[13px] text-azm-muted">{group.goal}</p>
+          <h3 className="truncate text-base font-bold text-[#F4F0FC]">{group.name}</h3>
+          <p className="mt-0.5 line-clamp-2 text-[13.5px] text-[#A79BC8]">{group.goal}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           <button
             onClick={() => store.editGroup(group)}
-            className="rounded-lg border border-white/10 bg-white/5 p-2 text-azm-muted hover:text-azm-ink hover:bg-white/10 transition-colors"
+            className="rounded-[10px] border border-[#A79BC8]/20 bg-[#1A1230] p-2 text-[#A79BC8] hover:text-[#F4F0FC] transition-colors"
             aria-label={d.common.edit}
             title={d.common.edit}
           >
@@ -85,7 +98,7 @@ function GroupCard({ group }: { group: SessionGroupDTO }) {
           </button>
           <button
             onClick={() => void store.deleteGroup(group.id)}
-            className="rounded-lg border border-white/10 bg-white/5 p-2 text-azm-muted hover:text-azm-bad hover:bg-azm-bad/10 transition-colors"
+            className="rounded-[10px] border border-[#FB7185]/35 bg-transparent p-2 text-[#FB7185] hover:bg-[#FB7185]/12 transition-colors"
             aria-label={d.common.delete}
             title={d.common.delete}
           >
@@ -95,20 +108,20 @@ function GroupCard({ group }: { group: SessionGroupDTO }) {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <span className="rounded-full border border-azm-primary/30 bg-azm-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-azm-soft">
+        <span className="rounded-full border border-[#8B5CF6]/35 bg-[#8B5CF6]/15 px-2.5 py-0.5 text-[12px] font-semibold text-[#A78BFA]">
           {group.workMinutes} {d.dashboard.minutes} {d.dashboard.work} / {group.breakMinutes} {d.dashboard.breakWord}
         </span>
-        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-azm-muted">
+        <span className="rounded-full border border-[#A79BC8]/20 bg-[#241946] px-2.5 py-0.5 text-[12px] font-medium text-[#A79BC8]">
           {d.setup[group.personality === "strict" ? "strict" : group.personality === "friend" ? "friend" : "philosopher"]}
         </span>
-        <span className="rounded-full border border-azm-ok/30 bg-azm-ok/10 px-2.5 py-0.5 text-[11px] font-medium text-azm-ok">
+        <span className="rounded-full border border-[#34D399]/35 bg-[#34D399]/12 px-2.5 py-0.5 text-[12px] font-semibold text-[#34D399]">
           {group.allowedSites.length} {d.dashboard.resourcesCount}
         </span>
       </div>
 
       <button
         onClick={() => void launch()}
-        className="azm-btn mt-auto flex w-full items-center justify-center gap-2 bg-[#7C3AED] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#8B5CF6] transition-colors azm-glow"
+        className="mt-auto flex w-full items-center justify-center gap-2 rounded-[12px] bg-[#7C3AED] px-4 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)] hover:bg-[#8B5CF6] transition-colors"
       >
         <PlayCircle size={17} />
         {d.dashboard.groupLaunch}
@@ -133,78 +146,81 @@ export function Dashboard() {
   const w = summary?.week;
 
   return (
-    <div className="space-y-8">
-      {/* Hero statement */}
-      <section className="azm-card azm-glow relative overflow-hidden p-6 md:p-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-24 inset-inline-end -translate-x-1/4 w-80 h-80 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.18), transparent 70%)" }}
-        />
-        <div className="flex flex-col md:flex-row md:items-center gap-6">
-          <LogoBadge size={84} className="shrink-0" />
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-azm-ink">{d.dashboard.greeting}</h1>
-            <p className="mt-1 text-azm-muted">{d.dashboard.greetingSub}</p>
-            <div className="mt-4">
-              {savedHours > 0 ? (
-                <p className="text-xl md:text-2xl font-bold text-azm-soft">
-                  {d.dashboard.statementSaved}{" "}
-                  <span className="azm-nums text-3xl md:text-4xl text-azm-primary">
-                    {savedHours.toFixed(1)}
-                  </span>{" "}
-                  {d.dashboard.statementHours}
-                </p>
-              ) : (
-                <p className="text-base text-azm-muted">{d.dashboard.statementZero}</p>
-              )}
-            </div>
-          </div>
-          <div className="shrink-0">
-            <button
-              onClick={() => {
-                store.resetDraft();
-                store.setView("setup");
-              }}
-              className="azm-btn flex items-center gap-2 bg-[#7C3AED] px-6 py-3.5 text-base font-semibold text-white hover:bg-[#8B5CF6] transition-colors azm-glow"
-            >
-              <Plus size={18} />
-              {d.dashboard.newSessionCta}
-            </button>
-          </div>
+    <div className="flex flex-col gap-7">
+      {/* Hero — matching extension dashboard */}
+      <section
+        className="relative overflow-hidden rounded-[18px] border border-[#A79BC8]/34 px-7 py-8 md:px-8 md:py-9"
+        style={{
+          background:
+            "radial-gradient(520px 260px at 100% 0%, rgba(124, 58, 237, 0.35), transparent 65%), linear-gradient(160deg, #1A1230, #130C22)",
+        }}
+      >
+        <div className="flex flex-col items-start gap-3">
+          <span className="inline-block rounded-full bg-[#8B5CF6]/16 px-3 py-1 text-[12.5px] font-bold text-[#A78BFA]">
+            {lang === "ar" ? "جاهز للانطلاق" : "Ready to launch"}
+          </span>
+
+          <h1 className="text-[28px] md:text-[34px] font-extrabold leading-tight text-[#F4F0FC]">
+            {d.dashboard.greeting}
+          </h1>
+
+          <p className="max-w-[540px] text-[16px] md:text-[17px] text-[#A79BC8] mb-1">
+            {d.dashboard.greetingSub}
+          </p>
+
+          {savedHours > 0 && (
+            <p className="text-base font-bold text-[#A78BFA]">
+              {d.dashboard.statementSaved}{" "}
+              <span className="text-2xl tabular-nums text-[#F4F0FC]">
+                {savedHours.toFixed(1)}
+              </span>{" "}
+              {d.dashboard.statementHours}
+            </p>
+          )}
+
+          <button
+            onClick={() => {
+              store.resetDraft();
+              store.setView("setup");
+            }}
+            className="mt-1 inline-flex items-center justify-center gap-2 rounded-[14px] bg-[#7C3AED] px-6 py-3 text-[16px] font-bold text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)] hover:bg-[#8B5CF6] transition-colors"
+          >
+            <Rocket size={19} />
+            <span>{lang === "ar" ? "بدء جلسة جديدة" : d.dashboard.newSessionCta}</span>
+          </button>
         </div>
       </section>
 
-      {/* Stats — mirrors brand component sheet */}
-      <section aria-label={d.dashboard.weekTitle}>
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-azm-soft">
-          <Sparkles size={16} className="text-azm-primary" />
-          {d.dashboard.weekTitle}
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats — This Week */}
+      <section className="flex flex-col gap-3" aria-label={d.dashboard.weekTitle}>
+        <h2 className="flex items-center gap-2 text-[18px] font-bold text-[#F4F0FC]">
+          <BarChart3 size={20} className="text-[#A78BFA]" />
+          <span>{d.dashboard.weekTitle}</span>
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
-            icon={<ShieldCheck size={15} />}
+            icon={<CheckCircle2 size={22} />}
             label={d.dashboard.statSupportive}
             value={w?.approved ?? 0}
             color="#34D399"
           />
           <StatCard
-            icon={<ShieldAlert size={15} />}
+            icon={<XCircle size={22} />}
             label={d.dashboard.statDistracting}
             value={(w?.blocked ?? 0) + (w?.attempts ?? 0) === 0 ? 0 : w?.blocked ?? 0}
             color="#FB7185"
           />
           <StatCard
-            icon={<HelpCircle size={15} />}
+            icon={<HelpCircle size={22} />}
             label={d.dashboard.statUncertain}
             value={w?.uncertain ?? 0}
             color="#FBBF24"
           />
           <StatCard
-            icon={<Zap size={15} />}
+            icon={<ShieldAlert size={22} />}
             label={d.dashboard.statInterventions}
             value={w?.attempts ?? 0}
-            color="#8B5CF6"
+            color="#A78BFA"
           />
         </div>
       </section>
@@ -212,20 +228,18 @@ export function Dashboard() {
       {/* Recommended tools */}
       <ToolRecommends />
 
-      {/* Groups */}
-      <section>
-        <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-azm-soft">
-          <Layers size={16} className="text-azm-primary" />
-          {d.dashboard.groupsTitle}
-        </div>
-        <p className="mb-4 text-[13px] text-azm-muted">{d.dashboard.groupsSubtitle}</p>
+      {/* Session Groups */}
+      <section className="flex flex-col gap-3">
+        <h2 className="flex items-center gap-2 text-[18px] font-bold text-[#F4F0FC]">
+          <Folder size={20} className="text-[#A78BFA]" />
+          <span>{d.dashboard.groupsTitle}</span>
+        </h2>
         {store.groups.length === 0 ? (
-          <div className="azm-card border-dashed p-8 text-center">
-            <Layers size={28} className="mx-auto text-azm-muted/60" />
-            <p className="mx-auto mt-3 max-w-md text-sm text-azm-muted">{d.dashboard.groupEmpty}</p>
+          <div className="rounded-[18px] border border-dashed border-[#A79BC8]/34 bg-[#130C22] px-5 py-7 text-center text-sm text-[#A79BC8]">
+            {d.dashboard.groupEmpty}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {store.groups.map((g) => (
               <GroupCard key={g.id} group={g} />
             ))}

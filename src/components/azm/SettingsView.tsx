@@ -1,10 +1,8 @@
-/* Azm — settings: language, personality, agent intervention levels, AI
- * customization, AI memory, workspace isolation, Chrome-extension pairing,
- * privacy & data control. */
+/* Azm — settings: synced with extension dashboard design */
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAzm } from "@/lib/azm/store";
 import { getDict } from "@/lib/azm/i18n";
@@ -14,7 +12,7 @@ import { AZM } from "@/lib/azm/tokens";
 import type { Personality } from "@/lib/azm/types";
 import * as api from "@/lib/azm/api";
 import {
-  Languages, VenetianMask, UserRound, Lightbulb, ShieldCheck, Database, FlaskConical, Info, Trash2,
+  VenetianMask, UserRound, Lightbulb, ShieldCheck, Database, FlaskConical, Info, Trash2,
   Gauge, Cpu, BrainCircuit, KeyRound, Fingerprint, Puzzle, Copy, RefreshCw, Download, Eye, EyeOff, Wifi, WifiOff,
   Timer, ListChecks, Server, CloudOff, Zap, Lock,
 } from "lucide-react";
@@ -29,12 +27,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+const CARD = "rounded-[18px] border border-[#A79BC8]/16 bg-[#130C22] p-5 md:p-6";
+const INPUT =
+  "rounded-[12px] border border-[#A79BC8]/34 bg-[#1A1230] px-3.5 py-2.5 text-[13.5px] text-[#F4F0FC] placeholder:text-[#A79BC8]/65 outline-none focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/25 transition";
+const BTN_PRIMARY =
+  "inline-flex items-center justify-center gap-1.5 rounded-[12px] bg-[#7C3AED] px-4 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)] hover:bg-[#8B5CF6] transition-colors disabled:opacity-45";
+const BTN_OUTLINE =
+  "inline-flex items-center justify-center gap-1.5 rounded-[12px] border border-[#A79BC8]/34 bg-transparent px-4 py-2.5 text-sm font-bold text-[#A78BFA] hover:bg-[#8B5CF6]/14 transition-colors disabled:opacity-45";
+
 function Row({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-white/5 pb-5 last:border-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 border-b border-[#A79BC8]/16 pb-5 last:border-0 last:pb-0 md:flex-row md:items-center md:justify-between">
       <div className="min-w-0">
-        <h3 className="text-sm font-semibold text-azm-ink">{title}</h3>
-        {hint && <p className="mt-1 text-[12px] leading-relaxed text-azm-muted">{hint}</p>}
+        <h3 className="text-[14.5px] font-bold text-[#F4F0FC]">{title}</h3>
+        {hint && <p className="mt-1 text-[13px] leading-relaxed text-[#A79BC8]">{hint}</p>}
       </div>
       <div className="shrink-0">{children}</div>
     </div>
@@ -54,7 +60,6 @@ export function SettingsView() {
   const d = getDict(lang);
   const [resetOpen, setResetOpen] = useState(false);
 
-  // AI customization local form state
   const [aiProvider, setAiProvider] = useState<ProviderId>("builtin");
   const [aiModel, setAiModel] = useState("");
   const [aiBaseUrl, setAiBaseUrl] = useState("");
@@ -65,18 +70,12 @@ export function SettingsView() {
   const [liveModels, setLiveModels] = useState<Array<{ id: string; tier?: string }> | null>(null);
   const [fetchingModels, setFetchingModels] = useState(false);
 
-  // intervention window slider (committed on release to avoid request storms)
   const [windowSec, setWindowSec] = useState<number | null>(null);
-
-  // memory form
   const [memoryText, setMemoryText] = useState("");
-
-  // profile import
   const [importCode, setImportCode] = useState("");
 
   const profileCode = store.profile?.code ?? "";
 
-  // load memory + poll extension connection status
   useEffect(() => {
     void store.loadMemory();
     const t = setInterval(() => {
@@ -89,10 +88,8 @@ export function SettingsView() {
         .catch(() => {});
     }, 8000);
     return () => clearInterval(t);
-     
   }, [profileCode]);
 
-  // sync AI form state from the profile (adjust-during-render pattern)
   const [formProfileCode, setFormProfileCode] = useState<string | null>(null);
   if (store.profile && formProfileCode !== profileCode) {
     setFormProfileCode(profileCode);
@@ -154,27 +151,27 @@ export function SettingsView() {
   const serverUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
-    <div className="space-y-5 azm-rise">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-bold text-azm-ink">{d.settings.title}</h1>
+    <div className="azm-rise flex flex-col gap-5">
+      <header className="space-y-1">
+        <h1 className="text-[26px] font-extrabold leading-snug text-[#F4F0FC]">{d.settings.title}</h1>
       </header>
 
       {/* language + personality */}
-      <section className="azm-card p-5 md:p-6">
+      <section className={`${CARD} space-y-5`}>
         <Row title={d.settings.languageLabel} hint={d.settings.languageHint}>
-          <div className="flex overflow-hidden rounded-xl border border-white/10">
+          <div className="inline-flex rounded-full border border-[#A79BC8]/20 bg-[#1A1230] p-1">
             <button
               onClick={() => store.setLang("ar")}
-              className={`px-4 py-2.5 text-sm font-semibold transition-colors ${
-                lang === "ar" ? "bg-[#7C3AED] text-white" : "bg-white/5 text-azm-muted hover:text-azm-ink"
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                lang === "ar" ? "bg-[#241946] text-[#A78BFA]" : "text-[#A79BC8] hover:text-[#F4F0FC]"
               }`}
             >
               العربية
             </button>
             <button
               onClick={() => store.setLang("en")}
-              className={`px-4 py-2.5 text-sm font-semibold transition-colors ${
-                lang === "en" ? "bg-[#7C3AED] text-white" : "bg-white/5 text-azm-muted hover:text-azm-ink"
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                lang === "en" ? "bg-[#241946] text-[#A78BFA]" : "text-[#A79BC8] hover:text-[#F4F0FC]"
               }`}
               dir="ltr"
             >
@@ -182,16 +179,17 @@ export function SettingsView() {
             </button>
           </div>
         </Row>
+
         <Row title={d.settings.personalityLabel} hint={d.settings.personalityHint}>
           <div className="flex flex-wrap gap-2">
             {personalities.map((p) => (
               <button
                 key={p.id}
                 onClick={() => store.setDefaultPersonality(p.id)}
-                className={`azm-btn flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-[12px] border px-3.5 py-2 text-[13px] font-bold transition-colors ${
                   store.defaultPersonality === p.id
-                    ? "bg-[#7C3AED] text-white"
-                    : "border border-white/10 bg-white/5 text-azm-muted hover:text-azm-ink"
+                    ? "border-[#8B5CF6] bg-[#7C3AED] text-white"
+                    : "border-[#A79BC8]/34 bg-[#1A1230] text-[#A79BC8] hover:border-[#A78BFA] hover:text-[#F4F0FC]"
                 }`}
               >
                 {p.icon}
@@ -203,12 +201,12 @@ export function SettingsView() {
       </section>
 
       {/* agent intervention level */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Gauge size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <Gauge size={18} className="text-[#A78BFA]" />
           {d.levels.title}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.levels.subtitle}</p>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.levels.subtitle}</p>
         <div className="grid gap-2.5 sm:grid-cols-2">
           {LEVEL_META.map((lv) => {
             const selected = (store.profile?.interventionLevel ?? "balanced") === lv.id;
@@ -216,20 +214,20 @@ export function SettingsView() {
               <button
                 key={lv.id}
                 onClick={() => void store.setInterventionLevel(lv.id)}
-                className={`azm-btn flex flex-col items-start gap-1 rounded-2xl border p-4 text-start transition-colors ${
+                className={`flex flex-col items-start gap-1 rounded-[14px] border p-4 text-start transition-all ${
                   selected
-                    ? "border-azm-primary bg-azm-primary/15"
-                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                    ? "border-[#8B5CF6] bg-[#7C3AED]/18 shadow-[0_0_0_2px_rgba(139,92,246,0.3)]"
+                    : "border-[#A79BC8]/34 bg-[#1A1230] hover:border-[#A78BFA]"
                 }`}
                 aria-pressed={selected}
               >
-                <span className={`flex items-center gap-2 text-sm font-bold ${selected ? "text-azm-soft" : "text-azm-ink"}`}>
-                  {lv.icon}
+                <span className="flex items-center gap-2 text-sm font-bold text-[#F4F0FC]">
+                  <span className="text-[#A78BFA]">{lv.icon}</span>
                   {d.levels[lv.nameKey]}
-                  {selected && <span className="rounded-full bg-azm-primary px-2 py-0.5 text-[10px] text-white">✓</span>}
+                  {selected && <span className="rounded-full bg-[#7C3AED] px-2 py-0.5 text-[10px] text-white">✓</span>}
                 </span>
-                <span className="text-[12px] leading-relaxed text-azm-muted">{d.levels[lv.descKey]}</span>
-                <span className="azm-nums text-[10px] text-azm-muted/70" dir="ltr">
+                <span className="text-[12.5px] leading-relaxed text-[#A79BC8]">{d.levels[lv.descKey]}</span>
+                <span className="tabular-nums text-[11px] text-[#A79BC8]/75" dir="ltr">
                   {LEVELS[lv.id].timerSec}s · {LEVELS[lv.id].maxRounds}r · {LEVELS[lv.id].breakBudgetMin}min
                 </span>
               </button>
@@ -238,17 +236,17 @@ export function SettingsView() {
         </div>
 
         {/* configurable human-intervention window */}
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="mt-4 rounded-[14px] border border-[#A79BC8]/20 bg-[#1A1230] p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Timer size={16} className="text-azm-primary" />
-              <h3 className="text-sm font-semibold text-azm-ink">{d.levels.windowTitle}</h3>
+              <Timer size={16} className="text-[#A78BFA]" />
+              <h3 className="text-sm font-bold text-[#F4F0FC]">{d.levels.windowTitle}</h3>
             </div>
-            <span className="azm-nums rounded-full border border-azm-primary/40 bg-azm-primary/10 px-3 py-1 text-[12px] font-bold text-azm-soft" dir="ltr">
+            <span className="tabular-nums rounded-full border border-[#8B5CF6]/40 bg-[#8B5CF6]/15 px-3 py-0.5 text-[12px] font-bold text-[#A78BFA]" dir="ltr">
               {windowSec ?? 30}s
             </span>
           </div>
-          <p className="mb-3 mt-2 text-[12px] leading-relaxed text-azm-muted">{d.levels.windowHint}</p>
+          <p className="mb-3 mt-1.5 text-[12.5px] leading-relaxed text-[#A79BC8]">{d.levels.windowHint}</p>
           <input
             type="range"
             min={10}
@@ -263,7 +261,7 @@ export function SettingsView() {
             aria-label={d.levels.windowTitle}
             dir="ltr"
           />
-          <div className="mt-1 flex justify-between text-[10px] text-azm-muted/70" dir="ltr">
+          <div className="mt-1 flex justify-between text-[11px] text-[#A79BC8]/75" dir="ltr">
             <span>10s</span>
             <span>30s</span>
             <span>60s</span>
@@ -273,52 +271,50 @@ export function SettingsView() {
       </section>
 
       {/* AI customization */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Cpu size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <Cpu size={18} className="text-[#A78BFA]" />
           {d.aiSettings.title}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.aiSettings.subtitle}</p>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.aiSettings.subtitle}</p>
 
-        {/* provider cards — with honest cost badges */}
         <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3" role="radiogroup" aria-label={d.aiSettings.providerLabel}>
           {PROVIDER_ORDER.map((pid) => {
             const pm = PROVIDERS[pid];
             const selected = aiProvider === pid;
             const tierStyle =
               pm.tier === "included"
-                ? { border: "rgba(52,211,153,0.4)", bg: "rgba(52,211,153,0.08)", color: AZM.ok, icon: <Zap size={11} /> }
+                ? { border: "rgba(52,211,153,0.4)", bg: "rgba(52,211,153,0.1)", color: AZM.ok, icon: <Zap size={11} /> }
                 : pm.tier === "free_tier"
-                  ? { border: "rgba(251,191,36,0.4)", bg: "rgba(251,191,36,0.08)", color: AZM.warn, icon: <Zap size={11} /> }
+                  ? { border: "rgba(251,191,36,0.4)", bg: "rgba(251,191,36,0.1)", color: AZM.warn, icon: <Zap size={11} /> }
                   : pm.tier === "local"
-                    ? { border: "rgba(167,139,250,0.4)", bg: "rgba(167,139,250,0.08)", color: AZM.primary, icon: <Server size={11} /> }
-                    : pm.tier === "paid"
-                      ? { border: "rgba(255,255,255,0.15)", bg: "rgba(255,255,255,0.05)", color: AZM.muted, icon: <CloudOff size={11} /> }
-                      : { border: "rgba(255,255,255,0.15)", bg: "rgba(255,255,255,0.05)", color: AZM.muted, icon: <CloudOff size={11} /> };
+                    ? { border: "rgba(167,139,250,0.4)", bg: "rgba(167,139,250,0.1)", color: AZM.primary, icon: <Server size={11} /> }
+                    : { border: "rgba(167,155,200,0.25)", bg: "rgba(167,155,200,0.08)", color: AZM.muted, icon: <CloudOff size={11} /> };
             return (
               <button
                 key={pid}
                 role="radio"
                 aria-checked={selected}
                 onClick={() => pickProvider(pid)}
-                className={`azm-btn flex flex-col items-start gap-1.5 rounded-2xl border p-4 text-start transition-colors ${
-                  selected ? "border-azm-primary bg-azm-primary/15" : "border-white/10 bg-white/5 hover:bg-white/10"
+                className={`flex flex-col items-start gap-1.5 rounded-[14px] border p-4 text-start transition-all ${
+                  selected
+                    ? "border-[#8B5CF6] bg-[#7C3AED]/18 shadow-[0_0_0_2px_rgba(139,92,246,0.3)]"
+                    : "border-[#A79BC8]/34 bg-[#1A1230] hover:border-[#A78BFA]"
                 }`}
               >
                 <span className="flex w-full items-center justify-between gap-2">
-                  <span className={`text-sm font-bold ${selected ? "text-azm-soft" : "text-azm-ink"}`}>{d.aiSettings[pid]}</span>
+                  <span className="text-sm font-bold text-[#F4F0FC]">{d.aiSettings[pid]}</span>
                   <span
-                    className="flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                    className="flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold"
                     style={{ borderColor: tierStyle.border, background: tierStyle.bg, color: tierStyle.color }}
-                    title={d.aiSettings[`tier_${pm.tier}` as "tier_included" | "tier_free_tier" | "tier_local" | "tier_paid" | "tier_none"]}
                   >
                     {tierStyle.icon}
                     {d.aiSettings[`tier_${pm.tier}` as "tier_included" | "tier_free_tier" | "tier_local" | "tier_paid" | "tier_none"]}
                   </span>
                 </span>
-                <span className="text-[11px] leading-relaxed text-azm-muted">{pm.hint}</span>
+                <span className="text-[11.5px] leading-relaxed text-[#A79BC8]">{pm.hint}</span>
                 {storedKeys[pid]?.hasKey && (
-                  <span className="flex items-center gap-1 text-[10px] font-semibold text-azm-ok" dir="ltr">
+                  <span className="flex items-center gap-1 text-[10.5px] font-semibold text-[#34D399]" dir="ltr">
                     <KeyRound size={10} />
                     {storedKeys[pid]!.keyPreview}
                   </span>
@@ -330,15 +326,14 @@ export function SettingsView() {
 
         {(aiProvider !== "builtin" && aiProvider !== "off") && (
           <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {/* model: editable + curated/live suggestions */}
-            <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-azm-soft">
+            <label className="flex flex-col gap-1.5 text-[12.5px] font-bold text-[#F4F0FC]">
               <span className="flex items-center justify-between gap-2">
                 {d.aiSettings.modelLabel}
                 <button
                   type="button"
                   onClick={() => void fetchModels()}
                   disabled={fetchingModels}
-                  className="azm-btn flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-azm-soft transition-colors hover:bg-white/10 disabled:opacity-40"
+                  className="inline-flex items-center gap-1 rounded-full border border-[#A79BC8]/34 bg-[#1A1230] px-2.5 py-1 text-[10.5px] font-semibold text-[#A78BFA] transition-colors hover:bg-[#241946] disabled:opacity-40"
                 >
                   <ListChecks size={11} />
                   {fetchingModels ? d.aiSettings.fetchingModels : d.aiSettings.fetchModels}
@@ -350,7 +345,7 @@ export function SettingsView() {
                 placeholder={meta.defaultModel}
                 dir="ltr"
                 list="azm-model-options"
-                className="azm-field border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-azm-ink placeholder:text-azm-muted/60 outline-none focus:border-azm-primary"
+                className={INPUT}
               />
               <datalist id="azm-model-options">
                 {(liveModels ?? meta.models).map((m) => (
@@ -358,16 +353,17 @@ export function SettingsView() {
                 ))}
               </datalist>
               {liveModels ? (
-                <span className="text-[10px] font-normal text-azm-ok">
+                <span className="text-[11px] font-normal text-[#34D399]">
                   {d.aiSettings.liveList} · {liveModels.length}
                 </span>
               ) : (
-                <span className="text-[10px] font-normal text-azm-muted">
+                <span className="text-[11px] font-normal text-[#A79BC8]">
                   {d.aiSettings.curatedList}
                 </span>
               )}
             </label>
-            <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-azm-soft">
+
+            <label className="flex flex-col gap-1.5 text-[12.5px] font-bold text-[#F4F0FC]">
               {d.aiSettings.baseUrlLabel}
               <input
                 value={aiBaseUrl}
@@ -375,19 +371,20 @@ export function SettingsView() {
                 placeholder={meta.defaultBaseUrl}
                 disabled={!meta.supportsBaseUrl}
                 dir="ltr"
-                className="azm-field border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-azm-ink placeholder:text-azm-muted/60 outline-none focus:border-azm-primary disabled:opacity-50"
+                className={`${INPUT} disabled:opacity-50`}
               />
               {aiProvider === "ollama" && (
-                <span className="text-[10px] font-normal leading-relaxed text-azm-muted">
+                <span className="text-[11px] font-normal leading-relaxed text-[#A79BC8]">
                   {d.aiSettings.ollamaReachHint}
                 </span>
               )}
             </label>
+
             {meta.requiresKey && (
-              <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-azm-soft md:col-span-2">
+              <label className="flex flex-col gap-1.5 text-[12.5px] font-bold text-[#F4F0FC] md:col-span-2">
                 {d.aiSettings.apiKeyLabel}
                 {storedKeys[aiProvider]?.hasKey && (
-                  <span className="flex items-center gap-2 text-[11px] font-normal text-azm-ok">
+                  <span className="flex items-center gap-2 text-[11.5px] font-normal text-[#34D399]">
                     <KeyRound size={12} />
                     {d.aiSettings.keyStored} ({storedKeys[aiProvider]!.keyPreview})
                   </span>
@@ -399,19 +396,19 @@ export function SettingsView() {
                     placeholder={aiProvider === "groq" ? "gsk_…" : "sk-…"}
                     type={showKey ? "text" : "password"}
                     dir="ltr"
-                    className="azm-field w-full border border-white/10 bg-white/5 px-3 py-2.5 pe-10 text-[13px] text-azm-ink placeholder:text-azm-muted/60 outline-none focus:border-azm-primary"
+                    className={`${INPUT} w-full pe-10`}
                     autoComplete="off"
                   />
                   <button
                     type="button"
                     onClick={() => setShowKey((v) => !v)}
-                    className="absolute end-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-azm-muted hover:text-azm-ink"
+                    className="absolute end-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-[#A79BC8] hover:text-[#F4F0FC]"
                     aria-label={showKey ? d.aiSettings.hideKey : d.aiSettings.showKey}
                   >
                     {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </span>
-                <span className="flex items-center gap-1.5 text-[10px] font-normal text-azm-muted">
+                <span className="flex items-center gap-1.5 text-[11px] font-normal text-[#A79BC8]">
                   <Lock size={10} />
                   {d.aiSettings.keyServerOnly}
                 </span>
@@ -420,7 +417,7 @@ export function SettingsView() {
           </div>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
           <button
             onClick={async () => {
               await store.updateAi({
@@ -432,7 +429,7 @@ export function SettingsView() {
               setAiApiKey("");
               toast.success(d.aiSettings.saved);
             }}
-            className="azm-btn bg-[#7C3AED] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#8B5CF6] transition-colors"
+            className={BTN_PRIMARY}
           >
             {d.aiSettings.save}
           </button>
@@ -450,12 +447,17 @@ export function SettingsView() {
               setTesting(false);
             }}
             disabled={testing}
-            className="azm-btn border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-azm-soft hover:bg-white/10 transition-colors disabled:opacity-40"
+            className={BTN_OUTLINE}
           >
             {testing ? d.aiSettings.testing : d.aiSettings.test}
           </button>
           {testResult && (
-            <span className={`text-[12px] font-semibold ${testResult.ok ? "text-azm-ok" : "text-azm-bad"}`} dir="ltr" role="status" aria-live="polite">
+            <span
+              className={`text-[12.5px] font-bold ${testResult.ok ? "text-[#34D399]" : "text-[#FB7185]"}`}
+              dir="ltr"
+              role="status"
+              aria-live="polite"
+            >
               {testResult.ok
                 ? `${d.aiSettings.testOk}${testResult.ms ? ` (${testResult.ms}ms)` : ""}`
                 : `${d.aiSettings.testFail}: ${testResult.error ?? ""}`}
@@ -465,15 +467,15 @@ export function SettingsView() {
       </section>
 
       {/* AI memory */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <BrainCircuit size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <BrainCircuit size={18} className="text-[#A78BFA]" />
           {d.memoryMgr.title}
-          <span className="azm-nums rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-azm-muted">
+          <span className="tabular-nums rounded-full bg-[#241946] px-2.5 py-0.5 text-[11.5px] text-[#A79BC8]">
             {store.memory.length}
           </span>
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.memoryMgr.subtitle}</p>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.memoryMgr.subtitle}</p>
 
         <div className="flex gap-2">
           <input
@@ -486,7 +488,7 @@ export function SettingsView() {
               }
             }}
             placeholder={d.memoryMgr.placeholder}
-            className="azm-field flex-1 border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-azm-ink placeholder:text-azm-muted/60 outline-none focus:border-azm-primary"
+            className={`${INPUT} flex-1`}
             aria-label={d.memoryMgr.placeholder}
           />
           <button
@@ -496,27 +498,31 @@ export function SettingsView() {
               setMemoryText("");
             }}
             disabled={!memoryText.trim()}
-            className="azm-btn bg-[#7C3AED] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#8B5CF6] transition-colors disabled:opacity-40"
+            className={BTN_PRIMARY}
           >
             {d.memoryMgr.add}
           </button>
         </div>
 
         <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pe-1" style={{ scrollbarWidth: "thin" }}>
-          {store.memory.length === 0 && <p className="py-3 text-center text-[12px] text-azm-muted">{d.memoryMgr.empty}</p>}
+          {store.memory.length === 0 && (
+            <p className="py-3 text-center text-[13px] text-[#A79BC8]">{d.memoryMgr.empty}</p>
+          )}
           {store.memory.map((m) => (
-            <div key={m.id} className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-white/5 p-3">
+            <div key={m.id} className="flex items-start gap-2.5 rounded-[12px] border border-[#A79BC8]/16 bg-[#1A1230] p-3">
               <span
-                className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                  m.source === "agent" ? "border border-azm-primary/40 bg-azm-primary/10 text-azm-soft" : "border border-azm-ok/40 bg-azm-ok/10 text-azm-ok"
+                className={`mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-[10.5px] font-bold ${
+                  m.source === "agent"
+                    ? "border border-[#8B5CF6]/40 bg-[#8B5CF6]/14 text-[#A78BFA]"
+                    : "border border-[#34D399]/40 bg-[#34D399]/14 text-[#34D399]"
                 }`}
               >
                 {m.source === "agent" ? d.memoryMgr.agentTag : d.memoryMgr.userTag}
               </span>
-              <p className="min-w-0 flex-1 text-[13px] leading-relaxed text-azm-ink">{m.text}</p>
+              <p className="min-w-0 flex-1 text-[13.5px] leading-relaxed text-[#F4F0FC]">{m.text}</p>
               <button
                 onClick={() => void store.deleteMemory(m.id)}
-                className="shrink-0 rounded-lg p-1.5 text-azm-muted hover:bg-white/10 hover:text-azm-bad transition-colors"
+                className="shrink-0 rounded-lg p-1.5 text-[#A79BC8] hover:bg-[#FB7185]/15 hover:text-[#FB7185] transition-colors"
                 aria-label={d.common.delete}
               >
                 <Trash2 size={14} />
@@ -527,21 +533,21 @@ export function SettingsView() {
       </section>
 
       {/* workspace isolation */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Fingerprint size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <Fingerprint size={18} className="text-[#A78BFA]" />
           {d.profileIso.title}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.profileIso.subtitle}</p>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.profileIso.subtitle}</p>
 
         <Row title={d.profileIso.codeLabel} hint={d.profileIso.warning}>
           <div className="flex items-center gap-2">
-            <code className="azm-nums rounded-xl border border-azm-primary/40 bg-azm-primary/10 px-4 py-2.5 text-lg font-bold tracking-[0.3em] text-azm-soft" dir="ltr">
+            <code className="tabular-nums rounded-[12px] border border-[#8B5CF6]/40 bg-[#8B5CF6]/14 px-4 py-2 text-lg font-extrabold tracking-[0.25em] text-[#A78BFA]" dir="ltr">
               {store.profile?.code ?? "········"}
             </code>
             <button
               onClick={() => void copyValue(store.profile?.code ?? "", d.profileIso.copyCode)}
-              className="azm-btn border border-white/15 bg-white/5 px-3 py-2.5 text-[12px] font-semibold text-azm-soft hover:bg-white/10 transition-colors"
+              className={BTN_OUTLINE}
               aria-label={d.profileIso.copyCode}
             >
               <Copy size={14} />
@@ -550,28 +556,25 @@ export function SettingsView() {
         </Row>
 
         {!store.profile && store.profileError && (
-          <div role="alert" className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-azm-bad/40 bg-azm-bad/10 px-3 py-2.5 text-[12px] text-azm-bad">
+          <div role="alert" className="mt-3 flex flex-wrap items-center gap-2 rounded-[12px] border border-[#FB7185]/40 bg-[#FB7185]/10 px-3 py-2.5 text-[12.5px] text-[#FB7185]">
             <span className="min-w-0 flex-1" dir="ltr">
               {d.profileIso.loadFailed} {store.profileError}
             </span>
-            <button
-              onClick={() => void store.loadProfile()}
-              className="azm-btn flex items-center gap-1.5 border border-white/15 bg-white/5 px-3 py-1.5 text-[12px] font-semibold text-azm-soft hover:bg-white/10 transition-colors"
-            >
+            <button onClick={() => void store.loadProfile()} className={BTN_OUTLINE}>
               <RefreshCw size={12} />
               {d.profileIso.retry}
             </button>
           </div>
         )}
 
-        <div className="mt-4 flex flex-col gap-2 border-t border-white/5 pt-4 sm:flex-row">
+        <div className="mt-4 flex flex-col gap-2 border-t border-[#A79BC8]/16 pt-4 sm:flex-row">
           <input
             value={importCode}
             onChange={(e) => setImportCode(e.target.value.toUpperCase())}
             placeholder={d.profileIso.importPlaceholder}
             maxLength={10}
             dir="ltr"
-            className="azm-field flex-1 border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] tracking-[0.2em] text-azm-ink placeholder:tracking-normal placeholder:text-azm-muted/60 outline-none focus:border-azm-primary"
+            className={`${INPUT} flex-1 tracking-[0.2em] placeholder:tracking-normal`}
             aria-label={d.profileIso.importLabel}
           />
           <button
@@ -580,7 +583,7 @@ export function SettingsView() {
               if (ok) setImportCode("");
             }}
             disabled={!importCode.trim()}
-            className="azm-btn border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-azm-soft hover:bg-white/10 transition-colors disabled:opacity-40"
+            className={BTN_OUTLINE}
           >
             {d.profileIso.importBtn}
           </button>
@@ -588,70 +591,74 @@ export function SettingsView() {
       </section>
 
       {/* Chrome extension pairing */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Puzzle size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <Puzzle size={18} className="text-[#A78BFA]" />
           {d.pairing.title}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.pairing.subtitle}</p>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.pairing.subtitle}</p>
 
-        <div className="mb-4 flex items-center gap-2 rounded-xl border px-3 py-2.5 text-[12px] font-semibold" style={{ borderColor: store.profile?.extConnected ? "rgba(52,211,153,0.4)" : "rgba(255,255,255,0.1)", background: store.profile?.extConnected ? "rgba(52,211,153,0.08)" : "rgba(255,255,255,0.05)" }}>
-          {store.profile?.extConnected ? <Wifi size={15} className="text-azm-ok" /> : <WifiOff size={15} className="text-azm-muted" />}
-          <span className={store.profile?.extConnected ? "text-azm-ok" : "text-azm-muted"}>{store.profile?.extConnected ? d.pairing.connected : d.pairing.disconnected}</span>
+        <div
+          className="mb-4 flex items-center gap-2 rounded-[12px] border px-3.5 py-2.5 text-[12.5px] font-bold"
+          style={{
+            borderColor: store.profile?.extConnected ? "rgba(52,211,153,0.4)" : "rgba(167,155,200,0.2)",
+            background: store.profile?.extConnected ? "rgba(52,211,153,0.1)" : "#1A1230",
+          }}
+        >
+          {store.profile?.extConnected ? <Wifi size={15} className="text-[#34D399]" /> : <WifiOff size={15} className="text-[#A79BC8]" />}
+          <span className={store.profile?.extConnected ? "text-[#34D399]" : "text-[#A79BC8]"}>
+            {store.profile?.extConnected ? d.pairing.connected : d.pairing.disconnected}
+          </span>
         </div>
 
         <Row title={d.pairing.tokenLabel} hint={`${d.pairing.serverUrlLabel}: ${serverUrl}`}>
           <div className="flex flex-wrap items-center gap-2">
-            <code className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-[12px] font-bold text-azm-soft" dir="ltr">
+            <code className="rounded-[12px] border border-[#A79BC8]/25 bg-[#1A1230] px-3 py-2 text-[12px] font-bold text-[#A78BFA]" dir="ltr">
               {store.profile ? `${store.profile.pairingToken.slice(0, 10)}…${store.profile.pairingToken.slice(-6)}` : "··········…······"}
             </code>
             <button
               onClick={() => void copyValue(store.profile?.pairingToken ?? "", d.pairing.copied)}
-              className="azm-btn border border-white/15 bg-white/5 px-3 py-2.5 text-[12px] font-semibold text-azm-soft hover:bg-white/10 transition-colors"
+              className={BTN_OUTLINE}
               aria-label={d.pairing.copy}
             >
               <Copy size={14} />
             </button>
             <button
               onClick={() => void store.regeneratePairing()}
-              className="azm-btn flex items-center gap-1.5 border border-azm-warn/40 bg-azm-warn/10 px-3 py-2.5 text-[12px] font-semibold text-azm-warn hover:bg-azm-warn/20 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-[12px] border border-[#FBBF24]/40 bg-[#FBBF24]/10 px-3 py-2.5 text-[12.5px] font-bold text-[#FBBF24] hover:bg-[#FBBF24]/20 transition-colors"
             >
               <RefreshCw size={13} />
               {d.pairing.regenerate}
             </button>
-            <a
-              href="/azm-extension.zip"
-              download
-              className="azm-btn flex items-center gap-1.5 bg-[#7C3AED] px-3.5 py-2.5 text-[12px] font-bold text-white hover:bg-[#8B5CF6] transition-colors"
-            >
+            <a href="/azm-extension.zip" download className={BTN_PRIMARY}>
               <Download size={13} />
               {d.pairing.download}
             </a>
           </div>
         </Row>
 
-        <p className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[12px] leading-relaxed text-azm-muted">
+        <p className="mt-3 rounded-[12px] border border-[#A79BC8]/16 bg-[#1A1230] p-3 text-[12.5px] leading-relaxed text-[#A79BC8]">
           {d.pairing.steps}
         </p>
-        <p className="mt-2 flex items-start gap-2 text-[11px] leading-relaxed text-azm-muted">
-          <ShieldCheck size={13} className="mt-0.5 shrink-0 text-azm-ok" />
+        <p className="mt-2 flex items-start gap-2 text-[11.5px] leading-relaxed text-[#A79BC8]">
+          <ShieldCheck size={13} className="mt-0.5 shrink-0 text-[#34D399]" />
           {d.pairing.privacy}
         </p>
       </section>
 
       {/* privacy & permissions */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <ShieldCheck size={18} className="text-azm-ok" />
+      <section className={CARD}>
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <ShieldCheck size={18} className="text-[#34D399]" />
           {d.settings.privacyTitle}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] leading-relaxed text-azm-muted">{d.settings.privacyIntro}</p>
-        <h3 className="mb-3 text-[13px] font-semibold text-azm-soft">{d.settings.permissionsTitle}</h3>
+        <p className="mb-4 mt-1.5 text-[13.5px] leading-relaxed text-[#A79BC8]">{d.settings.privacyIntro}</p>
+        <h3 className="mb-3 text-[13.5px] font-bold text-[#A78BFA]">{d.settings.permissionsTitle}</h3>
         <ul className="space-y-2.5">
           {[d.settings.permTabs, d.settings.permStorage, d.settings.permAlarms, d.settings.permHosts].map(
             (perm) => (
-              <li key={perm} className="flex items-start gap-2.5 text-[13px] leading-relaxed text-azm-ink">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-azm-primary" />
+              <li key={perm} className="flex items-start gap-2.5 text-[13.5px] leading-relaxed text-[#F4F0FC]">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B5CF6]" />
                 {perm}
               </li>
             )
@@ -659,14 +666,14 @@ export function SettingsView() {
         </ul>
       </section>
 
-      {/* data control */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Database size={18} className="text-azm-primary" />
+      {/* data control / danger zone */}
+      <section className="rounded-[18px] border border-[#FB7185]/35 bg-[#130C22] p-5 md:p-6">
+        <h2 className="mb-1 flex items-center gap-2 text-[17px] font-bold text-[#FB7185]">
+          <Database size={18} />
           {d.settings.dataTitle}
         </h2>
-        <p className="mb-4 mt-2 text-[13px] text-azm-muted">{d.settings.dataDesc}</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="mb-4 mt-1.5 text-[13.5px] text-[#A79BC8]">{d.settings.dataDesc}</p>
+        <div className="flex flex-wrap gap-2.5">
           <button
             onClick={async () => {
               try {
@@ -676,49 +683,49 @@ export function SettingsView() {
                 toast.error(d.toasts.networkError);
               }
             }}
-            className="azm-btn flex items-center gap-2 border border-azm-primary/40 bg-azm-primary/10 px-4 py-2.5 text-sm font-semibold text-azm-soft hover:bg-azm-primary/20 transition-colors"
+            className={BTN_OUTLINE}
           >
             <FlaskConical size={15} />
             {d.settings.demoBtn}
           </button>
           <button
             onClick={() => setResetOpen(true)}
-            className="azm-btn flex items-center gap-2 border border-azm-bad/40 bg-azm-bad/10 px-4 py-2.5 text-sm font-semibold text-azm-bad hover:bg-azm-bad/20 transition-colors"
+            className="inline-flex items-center gap-2 rounded-[12px] border border-[#FB7185]/50 bg-transparent px-4 py-2.5 text-sm font-bold text-[#FB7185] hover:bg-[#FB7185]/12 transition-colors"
           >
             <Trash2 size={15} />
             {d.settings.resetBtn}
           </button>
         </div>
-        <p className="mt-3 flex items-start gap-2 text-[11px] leading-relaxed text-azm-muted">
+        <p className="mt-3 flex items-start gap-2 text-[11.5px] leading-relaxed text-[#A79BC8]">
           <Info size={13} className="mt-0.5 shrink-0" />
           {d.settings.demoNote}
         </p>
       </section>
 
       {/* about */}
-      <section className="azm-card p-5 md:p-6">
-        <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <Info size={18} className="text-azm-primary" />
+      <section className={CARD}>
+        <h2 className="mb-2 flex items-center gap-2 text-[17px] font-bold text-[#F4F0FC]">
+          <Info size={18} className="text-[#A78BFA]" />
           {d.settings.aboutTitle}
         </h2>
-        <p className="text-[13px] leading-loose text-azm-muted">{d.settings.aboutBody}</p>
-        <p className="mt-3 text-[12px] text-azm-muted/70">{d.settings.version}</p>
+        <p className="text-[13.5px] leading-loose text-[#A79BC8]">{d.settings.aboutBody}</p>
+        <p className="mt-3 text-[12px] text-[#A79BC8]/70">{d.settings.version}</p>
       </section>
 
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-        <AlertDialogContent className="border-white/10 bg-[#120A1F] text-azm-ink" dir={lang === "ar" ? "rtl" : "ltr"}>
+        <AlertDialogContent className="rounded-[18px] border border-[#A79BC8]/30 bg-[#130C22] text-[#F4F0FC]" dir={lang === "ar" ? "rtl" : "ltr"}>
           <AlertDialogHeader>
             <AlertDialogTitle>{d.settings.resetConfirmTitle}</AlertDialogTitle>
-            <AlertDialogDescription className="text-azm-muted">
+            <AlertDialogDescription className="text-[#A79BC8]">
               {d.settings.resetConfirmBody}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/15 bg-white/5 text-azm-soft hover:bg-white/10">
+            <AlertDialogCancel className="rounded-[12px] border-[#A79BC8]/30 bg-[#1A1230] text-[#F4F0FC] hover:bg-[#241946]">
               {d.common.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-azm-bad text-white hover:bg-azm-bad/80"
+              className="rounded-[12px] bg-[#FB7185] font-bold text-[#1A0610] hover:bg-[#FDA4AF]"
               onClick={async () => {
                 try {
                   await api.apiResetAll();
@@ -740,4 +747,3 @@ export function SettingsView() {
     </div>
   );
 }
-

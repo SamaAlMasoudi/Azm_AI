@@ -1,4 +1,4 @@
-/* Azm — session setup: goal, task, outcome, technique, personality, approved resources, groups */
+/* Azm — session setup: synced with extension dashboard design */
 
 "use client";
 
@@ -42,13 +42,13 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="azm-card p-5 md:p-6">
-      <div className="mb-4 flex items-center gap-3">
-        <span className="azm-nums flex h-8 w-8 items-center justify-center rounded-xl border border-azm-primary/40 bg-azm-primary/10 text-sm font-bold text-azm-soft">
+    <section className="rounded-[18px] border border-[#A79BC8]/16 bg-[#130C22] p-5 md:p-6">
+      <div className="mb-4 flex items-center gap-2.5">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#7C3AED] text-sm font-extrabold text-white tabular-nums">
           {n}
         </span>
-        <h2 className="flex items-center gap-2 text-base font-semibold text-azm-ink">
-          <span className="text-azm-primary">{icon}</span>
+        <h2 className="flex items-center gap-2 text-[16.5px] font-bold text-[#F4F0FC]">
+          <span className="text-[#A78BFA]">{icon}</span>
           {title}
         </h2>
       </div>
@@ -58,7 +58,7 @@ function Section({
 }
 
 const FIELD =
-  "azm-field w-full border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-azm-ink placeholder:text-azm-muted/60 outline-none focus:border-azm-primary focus:ring-2 focus:ring-azm-primary/30 transition";
+  "w-full rounded-[12px] border border-[#A79BC8]/34 bg-[#1A1230] px-3.5 py-2.5 text-[15px] text-[#F4F0FC] placeholder:text-[#A79BC8]/65 outline-none focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/25 transition";
 
 export function SetupWizard() {
   const store = useAzm();
@@ -169,13 +169,13 @@ export function SetupWizard() {
   };
 
   return (
-    <div className="space-y-5">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-bold text-azm-ink">{d.setup.title}</h1>
-        <p className="mt-1 text-azm-muted">{d.setup.subtitle}</p>
+    <div className="flex flex-col gap-4">
+      <header className="mb-1">
+        <h1 className="text-[26px] font-extrabold leading-snug text-[#F4F0FC]">{d.setup.title}</h1>
+        <p className="mt-1 text-[15px] text-[#A79BC8]">{d.setup.subtitle}</p>
         {editing && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="rounded-full border border-azm-warn/40 bg-azm-warn/10 px-3 py-1 text-xs font-medium text-azm-warn">
+            <span className="rounded-full border border-[#FBBF24]/40 bg-[#FBBF24]/10 px-3 py-1 text-xs font-semibold text-[#FBBF24]">
               {d.setup.editingFrom} {draft.name || "—"}
             </span>
             <button
@@ -183,7 +183,7 @@ export function SetupWizard() {
                 store.cancelEditGroup();
                 store.resetDraft();
               }}
-              className="text-xs text-azm-muted underline-offset-2 hover:underline"
+              className="text-xs text-[#A79BC8] underline-offset-2 hover:text-[#F4F0FC] hover:underline"
             >
               {d.setup.cancelEdit}
             </button>
@@ -203,17 +203,18 @@ export function SetupWizard() {
           value={draft.goal}
           onChange={(e) => store.setDraft({ goal: e.target.value })}
         />
-        <p className="mt-2 text-[13px] text-azm-muted">{d.setup.step1Hint}</p>
+        <p className="mt-2 text-[13px] text-[#A79BC8]">{d.setup.step1Hint}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[12px] text-azm-muted">{d.setup.examples}:</span>
+          <span className="text-[12.5px] text-[#A79BC8]">{d.setup.examples}:</span>
           {(lang === "ar"
-            ? ["اختبار نهائي", "مشروع تخرج", "مساق Coursera"]
-            : ["Final exam", "Graduation project", "Coursera course"]
+            ? ["مسار Coursera", "مشروع تخرج", "اختبار نهائي"]
+            : ["Coursera course", "Graduation project", "Final exam"]
           ).map((ex) => (
             <button
               key={ex}
+              type="button"
               onClick={() => store.setDraft({ goal: draft.goal ? `${draft.goal} — ${ex}` : ex })}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-azm-soft hover:bg-white/10 transition-colors"
+              className="rounded-full border border-[#A79BC8]/34 bg-[#1A1230] px-3.5 py-1 text-[13px] text-[#A79BC8] hover:border-[#A78BFA] hover:bg-[#241946] hover:text-[#F4F0FC] transition-colors"
             >
               {ex}
             </button>
@@ -228,12 +229,12 @@ export function SetupWizard() {
         </label>
         <textarea
           id="task"
-          className={`${FIELD} min-h-[72px] resize-y`}
+          className={`${FIELD} min-h-[76px] resize-y`}
           placeholder={d.setup.step2Placeholder}
           value={draft.task}
           onChange={(e) => store.setDraft({ task: e.target.value })}
         />
-        <p className="mt-2 text-[13px] text-azm-muted">{d.setup.step2Hint}</p>
+        <p className="mt-2 text-[13px] text-[#A79BC8]">{d.setup.step2Hint}</p>
       </Section>
 
       {/* 3. Expected outcome */}
@@ -243,17 +244,17 @@ export function SetupWizard() {
         </label>
         <textarea
           id="outcome"
-          className={`${FIELD} min-h-[72px] resize-y`}
+          className={`${FIELD} min-h-[84px] resize-y`}
           placeholder={d.setup.step3Placeholder}
           value={draft.expectedOutcome}
           onChange={(e) => store.setDraft({ expectedOutcome: e.target.value })}
         />
-        <p className="mt-2 text-[13px] text-azm-muted">{d.setup.step3Hint}</p>
+        <p className="mt-2 text-[13px] text-[#A79BC8]">{d.setup.step3Hint}</p>
       </Section>
 
       {/* 4. Technique */}
       <Section n={4} title={d.setup.step4} icon={<Timer size={17} />}>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-2.5 sm:grid-cols-3">
           {(
             [
               { id: "pomodoro", name: d.setup.pomodoro, desc: d.setup.pomodoroDesc },
@@ -265,33 +266,33 @@ export function SetupWizard() {
             return (
               <button
                 key={t.id}
+                type="button"
                 onClick={() => chooseTechnique(t.id)}
-                className={`azm-card azm-card-hover p-4 text-start transition-all ${
+                className={`rounded-[12px] border p-4 text-start transition-all ${
                   selected
-                    ? "border-azm-primary bg-azm-primary/10 shadow-[0_0_24px_rgba(139,92,246,0.2)]"
-                    : ""
+                    ? "border-[#8B5CF6] bg-[#7C3AED]/18 shadow-[0_0_0_2px_rgba(139,92,246,0.3)]"
+                    : "border-[#A79BC8]/34 bg-[#1A1230] hover:border-[#A78BFA]"
                 }`}
                 aria-pressed={selected}
               >
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm font-bold ${selected ? "text-azm-soft" : "text-azm-ink"}`}>
-                    {t.name}
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-bold text-[#F4F0FC]">{t.name}</span>
                   <span
-                    className={`h-4 w-4 rounded-full border-2 ${
-                      selected ? "border-azm-primary bg-azm-primary" : "border-white/25"
+                    className={`h-4 w-4 shrink-0 rounded-full border-2 ${
+                      selected ? "border-[#8B5CF6] bg-[#7C3AED]" : "border-[#A79BC8]/40"
                     }`}
                   />
                 </div>
-                <p className="mt-1.5 text-[12px] leading-relaxed text-azm-muted">{t.desc}</p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-[#A79BC8]">{t.desc}</p>
               </button>
             );
           })}
         </div>
+
         {expandedTech && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-3.5 grid gap-3 rounded-[12px] border border-[#A79BC8]/16 bg-[#1A1230] p-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-azm-muted" htmlFor="work">
+              <label className="mb-1.5 block text-[13.5px] font-bold text-[#F4F0FC]" htmlFor="work">
                 {d.setup.workMinutes}
               </label>
               <input
@@ -299,7 +300,7 @@ export function SetupWizard() {
                 type="number"
                 min={5}
                 max={120}
-                className={`${FIELD} azm-nums`}
+                className={`${FIELD} tabular-nums font-bold`}
                 value={draft.workMinutes}
                 onChange={(e) =>
                   store.setDraft({ workMinutes: Math.max(5, Math.min(120, Number(e.target.value) || 5)) })
@@ -307,7 +308,7 @@ export function SetupWizard() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-azm-muted" htmlFor="brk">
+              <label className="mb-1.5 block text-[13.5px] font-bold text-[#F4F0FC]" htmlFor="brk">
                 {d.setup.breakMinutes}
               </label>
               <input
@@ -315,7 +316,7 @@ export function SetupWizard() {
                 type="number"
                 min={3}
                 max={30}
-                className={`${FIELD} azm-nums`}
+                className={`${FIELD} tabular-nums font-bold`}
                 value={draft.breakMinutes}
                 onChange={(e) =>
                   store.setDraft({ breakMinutes: Math.max(3, Math.min(30, Number(e.target.value) || 5)) })
@@ -328,25 +329,26 @@ export function SetupWizard() {
 
       {/* 5. Personality */}
       <Section n={5} title={d.setup.step5} icon={<VenetianMask size={17} />}>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-2.5 sm:grid-cols-3">
           {personalities.map((p) => {
             const selected = draft.personality === p.id;
             return (
               <button
                 key={p.id}
+                type="button"
                 onClick={() => store.setDraft({ personality: p.id })}
-                className={`azm-card azm-card-hover p-4 text-start transition-all ${
-                  selected ? "border-azm-primary bg-azm-primary/10 shadow-[0_0_24px_rgba(139,92,246,0.2)]" : ""
+                className={`rounded-[12px] border p-4 text-start transition-all ${
+                  selected
+                    ? "border-[#8B5CF6] bg-[#7C3AED]/18 shadow-[0_0_0_2px_rgba(139,92,246,0.3)]"
+                    : "border-[#A79BC8]/34 bg-[#1A1230] hover:border-[#A78BFA]"
                 }`}
                 aria-pressed={selected}
               >
                 <div className="flex items-center gap-2">
-                  <span className={selected ? "text-azm-soft" : "text-azm-primary"}>{p.icon}</span>
-                  <span className={`text-sm font-bold ${selected ? "text-azm-soft" : "text-azm-ink"}`}>
-                    {p.name}
-                  </span>
+                  <span className="text-[#A78BFA]">{p.icon}</span>
+                  <span className="text-sm font-bold text-[#F4F0FC]">{p.name}</span>
                 </div>
-                <p className="mt-1.5 text-[12px] leading-relaxed text-azm-muted">{p.desc}</p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-[#A79BC8]">{p.desc}</p>
               </button>
             );
           })}
@@ -355,9 +357,9 @@ export function SetupWizard() {
 
       {/* 6. Approved resources */}
       <Section n={6} title={d.setup.step6} icon={<Link2 size={17} />}>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
-            className={FIELD}
+            className={`${FIELD} flex-1 min-w-[220px]`}
             placeholder={d.setup.urlPlaceholder}
             value={urlInput}
             dir="ltr"
@@ -370,35 +372,37 @@ export function SetupWizard() {
             }}
           />
           <button
+            type="button"
             onClick={() => addUrl()}
-            className="azm-btn flex shrink-0 items-center gap-1.5 border border-azm-primary/50 bg-azm-primary/15 px-4 py-3 text-sm font-semibold text-azm-soft hover:bg-azm-primary/25 transition-colors"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-[12px] border border-[#A79BC8]/34 bg-transparent px-4 py-2.5 text-sm font-bold text-[#A78BFA] hover:bg-[#8B5CF6]/14 transition-colors"
           >
             <Plus size={16} />
             {d.setup.addBtn}
           </button>
         </div>
-        <p className="mt-2 text-[13px] text-azm-muted">{d.setup.step6Hint}</p>
+        <p className="mt-2 text-[13px] text-[#A79BC8]">{d.setup.step6Hint}</p>
 
         {draft.allowedSites.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-3.5 flex flex-wrap gap-2">
             {draft.allowedSites.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center gap-2 rounded-full border border-azm-ok/30 bg-azm-ok/10 py-1.5 pe-2 ps-3 text-[13px] text-azm-ink"
+                className="inline-flex items-center gap-2 rounded-full border border-[#8B5CF6]/35 bg-[#8B5CF6]/14 py-1 pe-2 ps-3 text-[13.5px] text-[#F4F0FC]"
               >
-                <span className="text-azm-ok">{kindIcon(s.kind)}</span>
-                <span className="max-w-[220px] truncate" dir="auto">
+                <span className="text-[#A78BFA]">{kindIcon(s.kind)}</span>
+                <span className="max-w-[220px] truncate text-[#A78BFA]" dir="auto">
                   {s.label}
                 </span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-azm-muted">
+                <span className="rounded-full bg-[#241946] px-2 py-0.5 text-[10.5px] text-[#A79BC8]">
                   {kindLabel(s.kind)}
                 </span>
                 <button
+                  type="button"
                   onClick={() => removeSite(s.id)}
-                  className="text-azm-muted hover:text-azm-bad transition-colors"
+                  className="grid h-5 w-5 place-items-center rounded-full text-[#A79BC8] hover:bg-[#FB7185]/20 hover:text-[#FB7185] transition-colors"
                   aria-label={d.setup.remove}
                 >
-                  <X size={14} />
+                  <X size={13} />
                 </button>
               </li>
             ))}
@@ -406,13 +410,14 @@ export function SetupWizard() {
         )}
 
         <div className="mt-4">
-          <span className="text-[12px] text-azm-muted">{d.setup.suggestions}:</span>
+          <span className="text-[12.5px] text-[#A79BC8]">{d.setup.suggestions}:</span>
           <div className="mt-2 flex flex-wrap gap-2">
             {SETUP_SUGGESTIONS.map((sg) => (
               <button
                 key={sg.url}
+                type="button"
                 onClick={() => addUrl(sg.url)}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[12px] text-azm-soft hover:border-azm-primary/50 hover:bg-azm-primary/10 transition-colors"
+                className="rounded-full border border-[#A79BC8]/34 bg-[#1A1230] px-3.5 py-1.5 text-[13px] text-[#A79BC8] hover:border-[#A78BFA] hover:bg-[#241946] hover:text-[#F4F0FC] transition-colors"
               >
                 {sg.label[lang]}
               </button>
@@ -424,11 +429,11 @@ export function SetupWizard() {
       {/* Tools recommendation */}
       <ToolRecommends compact />
 
-      {/* Launch */}
-      <section className="azm-card azm-glow p-5 md:p-6">
+      {/* Launch & Save Group */}
+      <section className="rounded-[18px] border border-[#8B5CF6]/50 bg-[#130C22] p-5 md:p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end">
           <div className="flex-1">
-            <label className="mb-1.5 block text-[13px] font-medium text-azm-muted" htmlFor="gname">
+            <label className="mb-1.5 block text-[13.5px] font-bold text-[#F4F0FC]" htmlFor="gname">
               {d.setup.groupNameLabel}
             </label>
             <input
@@ -439,8 +444,9 @@ export function SetupWizard() {
               onChange={(e) => store.setDraft({ name: e.target.value })}
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             <button
+              type="button"
               onClick={async () => {
                 if (!draft.goal.trim() || !draft.task.trim() || !draft.expectedOutcome.trim()) {
                   toast.error(d.setup.needGoal);
@@ -449,18 +455,19 @@ export function SetupWizard() {
                 await store.saveGroup();
                 if (!editing) store.resetDraft();
               }}
-              className="azm-btn flex items-center gap-2 border border-white/15 bg-white/5 px-5 py-3.5 text-sm font-semibold text-azm-soft hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 rounded-[14px] border border-[#A79BC8]/34 bg-transparent px-5 py-3 text-sm font-bold text-[#A78BFA] hover:bg-[#8B5CF6]/14 transition-colors"
             >
-              <Save size={16} />
+              <Save size={17} />
               {editing ? d.setup.updateGroupBtn : d.setup.saveGroupBtn}
             </button>
             <button
+              type="button"
               onClick={async () => {
                 if (!validateLaunch()) return;
                 await store.startSession();
                 store.resetDraft();
               }}
-              className="azm-btn flex items-center gap-2 bg-[#7C3AED] px-7 py-3.5 text-base font-bold text-white hover:bg-[#8B5CF6] transition-colors azm-glow"
+              className="inline-flex items-center gap-2 rounded-[14px] bg-[#7C3AED] px-6 py-3 text-[16px] font-bold text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)] hover:bg-[#8B5CF6] transition-colors"
             >
               <Rocket size={18} />
               {d.setup.launchBtn}

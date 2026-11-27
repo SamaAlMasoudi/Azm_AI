@@ -1,5 +1,4 @@
-/* Azm — active session view: timer, task, actions, Sabr tree, temporary grants,
- * smart-break budget, tools + simulated browser */
+/* Azm — active session view: synced with extension dashboard design */
 
 "use client";
 
@@ -18,6 +17,7 @@ import { ToolRecommends } from "./ToolRecommends";
 import { Coffee, LogOut, Plus, Target, Flag, Timer, KeyRound, BatteryMedium } from "lucide-react";
 
 const USEFUL_CATEGORIES = ["education", "reference", "ai_tool", "search"];
+const CARD = "rounded-[18px] border border-[#A79BC8]/16 bg-[#130C22]";
 
 export function ActiveSessionView() {
   const store = useAzm();
@@ -25,23 +25,20 @@ export function ActiveSessionView() {
   const d = getDict(lang);
   const active = store.active;
 
-  // the 1-second session heartbeat lives in AzmApp so the timer keeps
-  // running on every tab; this view just renders the store state
-
   const currentUrl = store.browserHistory[store.browserIdx] ?? "youtube.com";
   const dest = useMemo(() => resolveDestination(currentUrl), [currentUrl]);
 
   if (!active) {
     return (
-      <div className="azm-card flex flex-col items-center gap-4 p-12 text-center">
+      <div className={`${CARD} flex flex-col items-center gap-4 p-12 text-center`}>
         <Orb state="idle" size={96} />
-        <p className="text-lg text-azm-muted">{d.dashboard.statementZero}</p>
+        <p className="text-lg text-[#A79BC8]">{d.dashboard.statementZero}</p>
         <button
           onClick={() => {
             store.resetDraft();
             store.setView("setup");
           }}
-          className="azm-btn flex items-center gap-2 bg-[#7C3AED] px-6 py-3 text-sm font-bold text-white hover:bg-[#8B5CF6] transition-colors azm-glow"
+          className="inline-flex items-center gap-2 rounded-[14px] bg-[#7C3AED] px-6 py-3 text-sm font-bold text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)] hover:bg-[#8B5CF6] transition-colors"
         >
           <Plus size={16} />
           {d.dashboard.newSessionCta}
@@ -69,21 +66,32 @@ export function ActiveSessionView() {
       <div className="grid gap-5 lg:grid-cols-[1fr_330px]">
         {/* browser */}
         <div className="min-w-0 space-y-4">
-          <div className="azm-card relative flex items-center gap-3 p-4">
+          <div
+            className="relative flex items-center gap-3 rounded-[18px] border border-[#A79BC8]/34 p-4"
+            style={{
+              background:
+                "radial-gradient(420px 180px at 100% 0%, rgba(124, 58, 237, 0.25), transparent 65%), linear-gradient(160deg, #1A1230, #130C22)",
+            }}
+          >
             <Orb state={orbState} size={52} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-azm-ink">{active.goal}</p>
-              <p className="truncate text-[12px] text-azm-muted">{active.task}</p>
+              <p className="truncate text-sm font-bold text-[#F4F0FC]">{active.goal}</p>
+              <p className="truncate text-[12.5px] text-[#A79BC8]">{active.task}</p>
             </div>
             <span
-              className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold ${
+              className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11.5px] font-bold ${
                 orbState === "working"
-                  ? "border-azm-primary/40 bg-azm-primary/10 text-azm-soft"
+                  ? "border-[#8B5CF6]/40 bg-[#8B5CF6]/15 text-[#A78BFA]"
                   : orbState === "break"
-                    ? "border-azm-info/40 bg-azm-info/10 text-azm-info"
-                    : "border-azm-ok/40 bg-azm-ok/10 text-azm-ok"
+                    ? "border-[#FBBF24]/40 bg-[#FBBF24]/12 text-[#FBBF24]"
+                    : "border-[#34D399]/40 bg-[#34D399]/12 text-[#34D399]"
               }`}
             >
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  orbState === "break" ? "bg-[#FBBF24]" : "bg-[#34D399]"
+                }`}
+              />
               {d.orb[orbState]}
             </span>
           </div>
@@ -96,7 +104,11 @@ export function ActiveSessionView() {
 
         {/* side rail */}
         <aside className="space-y-4">
-          <div className={`azm-card flex flex-col items-center gap-2 p-5 ${store.timerPhase === "break" ? "azm-glow-info" : ""}`}>
+          <div
+            className={`${CARD} flex flex-col items-center gap-2 p-5 ${
+              store.timerPhase === "break" ? "border-[#FBBF24]/40" : "border-[#A79BC8]/30"
+            }`}
+          >
             <TimerRing
               secondsLeft={store.secondsLeft}
               totalSeconds={store.timerPhase === "break" ? active.breakMinutes * 60 : workSec}
@@ -104,52 +116,58 @@ export function ActiveSessionView() {
               caption={phaseLabel}
               size={190}
             />
-            <p className="azm-nums text-[12px] text-azm-muted">
-              {d.session.roundOf} {active.rounds} · {d.session.elapsed}: {Math.floor(active.focusedSeconds / 60)} {d.dashboard.minutes}
+            <p className="tabular-nums text-[12.5px] text-[#A79BC8]">
+              {d.session.roundOf} {active.rounds} · {d.session.elapsed}:{" "}
+              {Math.floor(active.focusedSeconds / 60)} {d.dashboard.minutes}
             </p>
           </div>
 
-          <div className="azm-card space-y-3 p-5">
+          <div className={`${CARD} space-y-3 p-5`}>
             {/* smart-break budget */}
-            <div className="flex items-center justify-between rounded-xl border border-azm-info/25 bg-azm-info/10 px-3 py-2.5 text-[12px]">
-              <span className="flex items-center gap-1.5 font-semibold text-azm-info">
-                <BatteryMedium size={14} />
+            <div className="flex items-center justify-between rounded-[12px] border border-[#FBBF24]/35 bg-[#FBBF24]/10 px-3 py-2.5 text-[12.5px]">
+              <span className="flex items-center gap-1.5 font-bold text-[#FBBF24]">
+                <BatteryMedium size={15} />
                 {d.session.breakBudgetLine}
               </span>
-              <span className="azm-nums font-bold text-azm-info" dir="ltr">
-                {Math.round(active.breakUsedSeconds / 60)}/{LEVELS[active.level].breakBudgetMin} {d.dialog.breakMinutes}
+              <span className="tabular-nums font-bold text-[#FBBF24]" dir="ltr">
+                {Math.round(active.breakUsedSeconds / 60)}/{LEVELS[active.level].breakBudgetMin}{" "}
+                {d.dialog.breakMinutes}
               </span>
             </div>
-            <div className="flex items-start gap-2.5">
-              <Flag size={15} className="mt-1 shrink-0 text-azm-soft" />
-              <div className="min-w-0">
-                <p className="text-[11px] font-medium text-azm-muted">{d.session.outcomeLabel}</p>
-                <p className="text-[13px] leading-relaxed text-azm-ink">{active.expectedOutcome}</p>
+
+            <div className="rounded-[12px] border border-[#A79BC8]/16 bg-[#0A0612]/45 p-3">
+              <div className="flex items-center gap-1.5 text-[12px] text-[#A79BC8]">
+                <Flag size={13} className="text-[#A78BFA]" />
+                <span>{d.session.outcomeLabel}</span>
               </div>
+              <p className="mt-1 text-[13.5px] font-semibold leading-relaxed text-[#F4F0FC]">
+                {active.expectedOutcome}
+              </p>
             </div>
-            <div className="flex items-start gap-2.5">
-              <Target size={15} className="mt-1 shrink-0 text-azm-soft" />
-              <div className="min-w-0">
-                <p className="text-[11px] font-medium text-azm-muted">{d.session.goalLabel}</p>
-                <p className="text-[13px] text-azm-ink">{active.goal}</p>
+
+            <div className="rounded-[12px] border border-[#A79BC8]/16 bg-[#0A0612]/45 p-3">
+              <div className="flex items-center gap-1.5 text-[12px] text-[#A79BC8]">
+                <Target size={13} className="text-[#A78BFA]" />
+                <span>{d.session.goalLabel}</span>
               </div>
+              <p className="mt-1 text-[13.5px] font-semibold text-[#F4F0FC]">{active.goal}</p>
             </div>
           </div>
 
-          <div className="azm-card p-5">
-            <h3 className="mb-3 text-sm font-semibold text-azm-soft">{d.session.actionsTitle}</h3>
+          <div className={`${CARD} p-5`}>
+            <h3 className="mb-3 text-sm font-bold text-[#F4F0FC]">{d.session.actionsTitle}</h3>
             <div className="space-y-2">
               <button
                 onClick={() => store.openDialog("break")}
                 disabled={store.timerPhase === "break"}
-                className="azm-btn flex w-full items-center justify-center gap-2 border border-azm-info/40 bg-azm-info/35 px-4 py-3 text-sm font-bold text-[#bfdbfe] hover:bg-azm-info/45 transition-colors disabled:opacity-40"
+                className="flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#A79BC8]/34 bg-[#1A1230] px-4 py-2.5 text-sm font-bold text-[#A78BFA] hover:bg-[#241946] transition-colors disabled:opacity-45"
               >
                 <Coffee size={16} />
                 {d.session.actionBreak}
               </button>
               <button
                 onClick={() => store.openDialog("end")}
-                className="azm-btn flex w-full items-center justify-center gap-2 border border-azm-bad/40 bg-azm-bad/35 px-4 py-3 text-sm font-bold text-[#fecdd3] hover:bg-azm-bad/45 transition-colors"
+                className="flex w-full items-center justify-center gap-2 rounded-[12px] bg-[#FB7185] px-4 py-2.5 text-sm font-bold text-[#1A0610] hover:bg-[#FDA4AF] transition-colors"
               >
                 <LogOut size={16} />
                 {d.session.actionEnd}
@@ -157,7 +175,7 @@ export function ActiveSessionView() {
               {store.timerPhase === "break" && store.breakKind === "agent" && (
                 <button
                   onClick={() => store.endBreakEarly()}
-                  className="azm-btn flex w-full items-center justify-center gap-2 border border-azm-ok/40 bg-azm-ok/10 px-4 py-3 text-[13px] font-bold text-azm-ok hover:bg-azm-ok/20 transition-colors"
+                  className="flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#34D399]/50 bg-[#34D399]/16 px-4 py-2.5 text-[13.5px] font-bold text-[#34D399] hover:bg-[#34D399]/26 transition-colors"
                 >
                   {d.session.endBreakEarlyBtn}
                 </button>
@@ -166,23 +184,31 @@ export function ActiveSessionView() {
           </div>
 
           {/* temporary access grants */}
-          <div className="azm-card p-5">
-            <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold text-azm-soft">
-              <KeyRound size={14} className="text-azm-ok" />
+          <div className={`${CARD} p-5`}>
+            <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-[#F4F0FC]">
+              <KeyRound size={15} className="text-[#34D399]" />
               {d.grants.title}
             </h3>
-            <p className="mb-3 text-[11px] text-azm-muted">{d.grants.subtitle}</p>
+            <p className="mb-3 text-[12px] text-[#A79BC8]">{d.grants.subtitle}</p>
             <div className="max-h-40 space-y-2 overflow-y-auto pe-1" style={{ scrollbarWidth: "thin" }}>
-              {store.grants.length === 0 && <p className="py-2 text-center text-[12px] text-azm-muted">{d.grants.empty}</p>}
+              {store.grants.length === 0 && (
+                <p className="py-2 text-center text-[12.5px] text-[#A79BC8]">{d.grants.empty}</p>
+              )}
               {store.grants.map((g) => {
                 const leftMs = Math.max(0, g.expiresAt - Date.now());
                 const leftMin = Math.ceil(leftMs / 60000);
                 return (
-                  <div key={g.id} className="flex items-center justify-between gap-2 rounded-xl border border-azm-ok/25 bg-azm-ok/5 px-3 py-2">
-                    <span className="min-w-0 truncate text-[12px] font-semibold text-azm-ink" dir="ltr">
+                  <div
+                    key={g.id}
+                    className="flex items-center justify-between gap-2 rounded-[12px] border border-[#34D399]/30 bg-[#34D399]/8 px-3 py-2"
+                  >
+                    <span className="min-w-0 truncate text-[12.5px] font-semibold text-[#F4F0FC]" dir="ltr">
                       {g.domain}
                     </span>
-                    <span className="azm-nums shrink-0 rounded-full border border-azm-ok/40 bg-azm-ok/10 px-2 py-0.5 text-[10px] font-bold text-azm-ok" dir="ltr">
+                    <span
+                      className="tabular-nums shrink-0 rounded-full border border-[#34D399]/40 bg-[#34D399]/14 px-2 py-0.5 text-[11px] font-bold text-[#34D399]"
+                      dir="ltr"
+                    >
                       {leftMin} {d.dashboard.minutes} {d.grants.left}
                     </span>
                   </div>
@@ -191,28 +217,30 @@ export function ActiveSessionView() {
             </div>
           </div>
 
-          <div className="azm-card flex flex-col items-center p-5">
+          <div className={`${CARD} flex flex-col items-center p-5`}>
             <div className="mb-2 flex w-full items-center justify-between">
-              <h3 className="text-sm font-semibold text-azm-soft">{d.session.treeTitle}</h3>
-              <span className="rounded-full border border-azm-ok/40 bg-azm-ok/10 px-2.5 py-0.5 text-[11px] font-semibold text-azm-ok">
+              <h3 className="text-sm font-bold text-[#F4F0FC]">{d.session.treeTitle}</h3>
+              <span className="rounded-full border border-[#34D399]/40 bg-[#34D399]/12 px-2.5 py-0.5 text-[11.5px] font-bold text-[#34D399]">
                 {d.session.treeStages[Math.min(5, Math.floor(active.focusedSeconds / (active.workMinutes * 60 / 6)))]}
               </span>
             </div>
-            <SabrTree stage={Math.min(5, Math.floor(active.focusedSeconds / (active.workMinutes * 60 / 6)))} size={190} />
-            <p className="text-[11px] text-azm-muted">{d.session.treeSub}</p>
+            <SabrTree
+              stage={Math.min(5, Math.floor(active.focusedSeconds / (active.workMinutes * 60 / 6)))}
+              size={190}
+            />
+            <p className="text-[12px] text-[#A79BC8]">{d.session.treeSub}</p>
           </div>
 
-          <div className="azm-card p-5">
-            <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold text-azm-soft">
-              <Timer size={14} className="text-azm-primary" />
+          <div className={`${CARD} p-5`}>
+            <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-[#F4F0FC]">
+              <Timer size={15} className="text-[#A78BFA]" />
               {d.session.toolsTitle}
             </h3>
-            <p className="mb-3 text-[11px] text-azm-muted">{d.session.toolsSub}</p>
+            <p className="mb-3 text-[12px] text-[#A79BC8]">{d.session.toolsSub}</p>
             <ToolRecommends compact />
           </div>
         </aside>
       </div>
-
     </div>
   );
 }

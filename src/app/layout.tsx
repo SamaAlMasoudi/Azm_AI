@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./fonts/fonts.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: "عزم | رفيقك الذكي للدراسة والتركيز",
   description:
